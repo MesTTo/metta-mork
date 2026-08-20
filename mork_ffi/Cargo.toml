@@ -1,0 +1,18 @@
+[package]
+name = "mork_ffi"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+mork-frontend = { path = "../../MORK/frontend" }
+mork-expr = { path = "../../MORK/expr" }
+mork = { path = "../../MORK/kernel" }
+# Feature-unifies with PathMap's jemalloc: initial-exec TLS refuses
+# dlopen into a live process ("cannot allocate memory in static TLS
+# block"), which is exactly how an embedding host loads this library
+# when no LD_PRELOAD preceded it.
+tikv-jemallocator = { version = "0.6.0", features = ["disable_initial_exec_tls"] }
+
+[lib]
+name = "mork_ffi"
+crate-type = ["cdylib"]
