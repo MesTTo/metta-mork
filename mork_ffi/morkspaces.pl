@@ -1,9 +1,9 @@
 % Purpose: connect named MeTTa spaces to MORK through its text FFI protocol,
 %   as a provider behind the engine's foreign-space seam.
 % Assumes:
-%   - the engine consults metta_foreign_space/1 before its own storage, and
+%   - the engine consults seam:foreign_space/1 before its own storage, and
 %     its foreign match clause splits conjunctions per conjunct and answers
-%     an unbound pattern through metta_foreign_atoms/2
+%     an unbound pattern through seam:foreign_atoms/2
 %     [source: engine/spaces.pl, match_foreign/4]
 % Guarantees:
 %   - a MORK space refuses an unbound space name the way a native one does
@@ -27,19 +27,19 @@
 %
 %Load ORDER is no longer load-bearing either, which is the part worth
 %checking rather than assuming: the seam dispatches on
-%metta_foreign_space/1 rather than on clause position, so this file was moved
+%seam:foreign_space/1 rather than on clause position, so this file was moved
 %AFTER spaces in engine/metta.pl's boot list and the whole gate, the fifteen MORK
 %tests included, passes unchanged [verified 2026-08-16]. Before the port,
 %precedence came from a position in an ensure_loaded list and nothing
 %declared it.
-:- multifile metta_foreign_space/1.
-:- multifile metta_foreign_add/2.
-:- multifile metta_foreign_add_many/2.
-:- multifile metta_foreign_remove/3.
-:- multifile metta_foreign_atoms/2.
-:- multifile metta_foreign_match/3.
-:- multifile metta_foreign_capability/2.
-:- multifile metta_foreign_plan/5.
+:- multifile seam:foreign_space/1.
+:- multifile seam:foreign_add/2.
+:- multifile seam:foreign_add_many/2.
+:- multifile seam:foreign_remove/3.
+:- multifile seam:foreign_atoms/2.
+:- multifile seam:foreign_match/3.
+:- multifile seam:foreign_capability/2.
+:- multifile seam:foreign_plan/5.
 
 %MORK spaces address from MeTTa as &mork (the default space) or
 %&mork:<name>, each name its own store inside MORK, created on first
@@ -91,11 +91,11 @@ mork_require_text_safe(Term, Operation) :-
 %with it, which is what an ownership seam asks of a provider: "every provider
 %in this tree writes ONE clause with a variable space and an ownership guard in
 %the body, which unifies with any space at all"
-%[source: engine/ext_points.pl, the metta_foreign_capability/2 note].
+%[source: engine/ext_points.pl, the seam:foreign_capability/2 note].
 %
 %It was spelled out twice and MISSING from the four seams that touch the
 %provider, which left the ownership test to mork_call/4 further down each body.
-%That is too late: metta_foreign_match/3 and metta_foreign_add/2 ask
+%That is too late: seam:foreign_match/3 and seam:foreign_add/2 ask
 %mork_require_text_safe/2 FIRST, and that refuses rather than fails. MORK's
 %clauses come first in every one of these multifile predicates, so a value with
 %no MeTTa text spelling reaching any OTHER provider's space got MORK's domain
@@ -115,7 +115,7 @@ mork_owns_space(Space) :- atom(Space),
 
 %A MORK space is a foreign space: its atoms live outside the Prolog
 %database and this file owns every read and write of them.
-metta_foreign_space(Space) :- mork_owns_space(Space).
+seam:foreign_space(Space) :- mork_owns_space(Space).
 
 %Four of the five, declared. MORK has no clear, and saying so is what turns
 %(clear &mork) from a silent nothing into a refusal that names the space and
@@ -130,7 +130,7 @@ metta_foreign_space(Space) :- mork_owns_space(Space).
 %What it does NOT cover is an equation that reaches MORK another way, an
 %mm2-exec write or MORK's own loader: the engine is told about an add, so an
 %equation nothing added is stored and inert.
-metta_foreign_capability(Space, Capability) :-
+seam:foreign_capability(Space, Capability) :-
     mork_owns_space(Space),
     member(Capability, [add, remove, match, enumerate, rules, plan]).
 
@@ -146,13 +146,13 @@ metta_foreign_capability(Space, Capability) :-
 %every name beginning &mork, so there is no one name to write the atom
 %about; mork_owns_space/1 is the same one-prefix test that guards the rest
 %of this file [P12.14].
-:- multifile metta_context_events/3.
-metta_context_events(Space, 'at-most-once', ordered) :-
+:- multifile seam:context_events/3.
+seam:context_events(Space, 'at-most-once', ordered) :-
     mork_owns_space(Space).
 
 %Add an atom to the space. The engine fires the write hooks around
 %metta_add_atom/3, so subscriptions and reflection see MORK writes too:
-metta_foreign_add(Space, Atom) :- mork_owns_space(Space),
+seam:foreign_add(Space, Atom) :- mork_owns_space(Space),
                                   mork_require_text_safe(Atom, 'add-atom'/3),
                                   swrite(Atom, S),
                                   mork_call(Space, "queue-atom", S, "OK: queued").
@@ -168,7 +168,7 @@ metta_foreign_add(Space, Atom) :- mork_owns_space(Space),
     atomics_to_string(Lines, "\n", Payload),
     mork_call(Space, "add-atoms", Payload, "OK: loaded"),
     forall(member(Atom, Atoms),
-           forall(metta_on_atom_added(Space, Atom), true)).
+           forall(seam:atom_added(Space, Atom), true)).
 
 mork_require_text_safe_for_add(Atom) :-
     mork_require_text_safe(Atom, 'mork-add-atoms'/3).
@@ -176,7 +176,7 @@ mork_require_text_safe_for_add(Atom) :-
 %The engine's batch seam, answered with the same crossing. It routes only atoms
 %whose add is a store and nothing more through here, so a batch that reaches
 %MORK has nothing for the per-atom path to have done differently.
-metta_foreign_add_many(Space, Atoms) :- 'mork-add-atoms'(Space, Atoms, true).
+seam:foreign_add_many(Space, Atoms) :- 'mork-add-atoms'(Space, Atoms, true).
 
 %MORK answers every removal with "OK: loaded" and no count, so whether
 %anything was there is a separate question, and it is asked through MORK's
@@ -188,7 +188,7 @@ metta_foreign_add_many(Space, Atoms) :- 'mork-add-atoms'(Space, Atoms, true).
 %1 [measured 2026-08-19], so there is never a second copy for a sweep to take.
 %That is a divergence from the multiset a space is meant to be, and it is on
 %the ADD side rather than this one.
-metta_foreign_remove(Space, Atom, Removed) :-
+seam:foreign_remove(Space, Atom, Removed) :-
     mork_owns_space(Space),
     ( mork_holds(Space, Atom) -> Removed = true ; Removed = false ),
     mork_require_text_safe(Atom, 'remove-atom'/3),
@@ -200,15 +200,15 @@ metta_foreign_remove(Space, Atom, Removed) :-
 %with one [source: engine/spaces.pl, match_foreign/4].
 mork_holds(Space, Atom) :-
     \+ \+ ( var(Atom)
-            -> metta_foreign_atoms(Space, Atom)
-            ;  metta_foreign_match(Space, Atom, []) ).
+            -> seam:foreign_atoms(Space, Atom)
+            ;  seam:foreign_match(Space, Atom, []) ).
 
 %Match one pattern, MORK's own matching rather than a scan. The engine
 %hands over one non-conjunctive, bound pattern at a time: it splits a
 %conjunction per conjunct and answers an unbound pattern through
-%metta_foreign_atoms/2, so joins over this space are the engine's joins,
+%seam:foreign_atoms/2, so joins over this space are the engine's joins,
 %each conjunct answered by MORK.
-metta_foreign_match(Space, Pattern, _Options) :- mork_owns_space(Space),
+seam:foreign_match(Space, Pattern, _Options) :- mork_owns_space(Space),
                                        Pattern_Template = [Pattern, Pattern],
                                        mork_require_text_safe(Pattern_Template, match/4),
                                        swrite(Pattern_Template, MorkPat),
@@ -228,7 +228,7 @@ metta_foreign_match(Space, Pattern, _Options) :- mork_owns_space(Space),
 %the seam asks of a claim: an atom whose symbols do not survive MORK's text
 %boundary, or a conjunct that is not a written pattern. Declining costs the
 %caller the ordinary split and nothing else.
-metta_foreign_plan(Space, Conjuncts, Conjuncts, [], mork_query_multi(Space, Conjuncts)) :-
+seam:foreign_plan(Space, Conjuncts, Conjuncts, [], mork_query_multi(Space, Conjuncts)) :-
     mork_space_name(Space, _),
     forall(member(Conjunct, Conjuncts), mork_plannable_pattern(Conjunct)).
 
@@ -254,7 +254,7 @@ mork_query_multi(Space, Conjuncts) :-
     Vars = Values.
 
 %Get all atoms in space, irregard of arity:
-metta_foreign_atoms(Space, Pattern) :- mork_owns_space(Space),
+seam:foreign_atoms(Space, Pattern) :- mork_owns_space(Space),
                                        mork_call(Space, "get-atoms", "", Temp),
                                        mork_response_term(Temp, Pattern).
 
@@ -301,17 +301,17 @@ mork_response_term(Response, Term) :- split_string(Response, "\n", "", Lines),
 %The builtins this bridge provides, named where they are defined. The engine
 %registers whatever is declared and knows none of these names; they exist only
 %when this file loads, which is the condition it would otherwise have to test.
-:- multifile metta_backend_builtin/1.
-metta_backend_builtin('mm2-exec').
-metta_backend_builtin('mork-add-atoms').
-metta_backend_builtin('mork-flush').
+:- multifile seam:backend_builtin/1.
+seam:backend_builtin('mm2-exec').
+seam:backend_builtin('mork-add-atoms').
+seam:backend_builtin('mork-flush').
 
 %This backend's smoke test, run by the CLI demo. It was mork_test/0 called by
 %name from engine/main.pl, which is why that file had a `mork` branch at all.
-:- multifile metta_backend_selftest/0.
+:- multifile seam:backend_selftest/0.
 %add-atom answers unit ([]), the arbiter's doctrine; demanding the old true
 %made this fail silently inside the demo's forall from the day that changed.
-metta_backend_selftest :-
+seam:backend_selftest :-
     'add-atom'('&mork', [friend,sam,tim], []),
     'add-atom'('&mork', [friend,sam,joe], []),
     findall(C, match('&mork', [friend,sam,X], [friend,sam,X], C), Cs),
