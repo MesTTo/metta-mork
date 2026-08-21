@@ -293,9 +293,11 @@ metta_backend_builtin('mork-flush').
 %This backend's smoke test, run by the CLI demo. It was mork_test/0 called by
 %name from engine/main.pl, which is why that file had a `mork` branch at all.
 :- multifile metta_backend_selftest/0.
+%add-atom answers unit ([]), the arbiter's doctrine; demanding the old true
+%made this fail silently inside the demo's forall from the day that changed.
 metta_backend_selftest :-
-    'add-atom'('&mork', [friend,sam,tim], true),
-    'add-atom'('&mork', [friend,sam,joe], true),
+    'add-atom'('&mork', [friend,sam,tim], []),
+    'add-atom'('&mork', [friend,sam,joe], []),
     findall(C, match('&mork', [friend,sam,X], [friend,sam,X], C), Cs),
     format(string(SC), "MORK query result: ~w ~n", [Cs]),
     writeln(SC).
