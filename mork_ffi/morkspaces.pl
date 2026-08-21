@@ -134,6 +134,22 @@ metta_foreign_capability(Space, Capability) :-
     mork_owns_space(Space),
     member(Capability, [add, remove, match, enumerate, rules, plan]).
 
+%What a MORK space's change events promise. at-most-once, and the reason is
+%the paragraph above: an add THROUGH the engine fires the write hooks, so a
+%watcher hears it exactly once and in write order, and an mm2-exec write or
+%MORK's own loader reaches the store without the engine being told, so that
+%change reaches no watcher at all. Some writes are delivered and none is
+%delivered twice is exactly at-most-once, and ordered is honest because the
+%deliveries that do happen are synchronous inside their own write.
+%
+%The seam rather than an (events &mork ...) atom because a MORK space is
+%every name beginning &mork, so there is no one name to write the atom
+%about; mork_owns_space/1 is the same one-prefix test that guards the rest
+%of this file [P12.14].
+:- multifile metta_context_events/3.
+metta_context_events(Space, 'at-most-once', ordered) :-
+    mork_owns_space(Space).
+
 %Add an atom to the space. The engine fires the write hooks around
 %metta_add_atom/3, so subscriptions and reflection see MORK writes too:
 metta_foreign_add(Space, Atom) :- mork_owns_space(Space),
