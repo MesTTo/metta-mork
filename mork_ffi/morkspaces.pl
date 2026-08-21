@@ -8,6 +8,10 @@
 % Guarantees:
 %   - a MORK space refuses an unbound space name the way a native one does
 %     [tested: spaces_storage_modules:matching_requires_a_named_space].
+%   - a space this backend does not own leaves every ownership seam here by
+%     FAILING, so the next provider's clause runs and no value is refused on
+%     its behalf
+%     [tested: test_a_query_joins_stored_atoms_with_live_object_fields].
 % Open Obligations:
 %   To Do: None
 %   Hacks: None
@@ -83,21 +87,39 @@ mork_require_text_safe(Term, Operation) :-
                              'symbol names containing whitespace, parentheses or quotes, and numbers whose printed form is not read back as the same number, cannot cross the MORK text boundary')))
     ; true ).
 
-%A MORK space is a foreign space: its atoms live outside the Prolog
-%database and this file owns every read and write of them.
+%Whether a request is this backend's at all. Every ownership seam below opens
+%with it, which is what an ownership seam asks of a provider: "every provider
+%in this tree writes ONE clause with a variable space and an ownership guard in
+%the body, which unifies with any space at all"
+%[source: engine/ext_points.pl, the metta_foreign_capability/2 note].
+%
+%It was spelled out twice and MISSING from the four seams that touch the
+%provider, which left the ownership test to mork_call/4 further down each body.
+%That is too late: metta_foreign_match/3 and metta_foreign_add/2 ask
+%mork_require_text_safe/2 FIRST, and that refuses rather than fails. MORK's
+%clauses come first in every one of these multifile predicates, so a value with
+%no MeTTa text spelling reaching any OTHER provider's space got MORK's domain
+%error and that provider's clause was never tried. It stayed invisible while
+%metta_unwritable_symbol/2 answered no for an opaque host value; the walk in
+%engine/parser.pl answers yes for one now, so a Python object_view's Box in a
+%pattern was refused by a backend with no claim on it.
 %
 %Every MORK space name starts with &mork, and the engine asks this question
 %on every write and every match, native spaces included. One prefix test
 %rejects every other space before the name is parsed: parsing first cost 400
 %inferences over register-op's registrations and 5 over a five-way join
 %[measured 2026-08-15].
-metta_foreign_space(Space) :- atom(Space),
-                              sub_atom(Space, 0, 5, _, '&mork'),
-                              mork_space_name(Space, _).
+mork_owns_space(Space) :- atom(Space),
+                          sub_atom(Space, 0, 5, _, '&mork'),
+                          mork_space_name(Space, _).
+
+%A MORK space is a foreign space: its atoms live outside the Prolog
+%database and this file owns every read and write of them.
+metta_foreign_space(Space) :- mork_owns_space(Space).
 
 %Four of the five, declared. MORK has no clear, and saying so is what turns
 %(clear &mork) from a silent nothing into a refusal that names the space and
-%the operation. The same cheap prefix test guards this as guards the space
+%the operation. The same ownership test guards this as guards the space
 %itself, so an unrelated space costs one sub_atom/5 to reject.
 %rules is declared because MORK holds whatever atoms it is given, EQUATIONS
 %included. That is the whole of what the capability asks: the engine compiles
@@ -109,14 +131,13 @@ metta_foreign_space(Space) :- atom(Space),
 %mm2-exec write or MORK's own loader: the engine is told about an add, so an
 %equation nothing added is stored and inert.
 metta_foreign_capability(Space, Capability) :-
-    atom(Space),
-    sub_atom(Space, 0, 5, _, '&mork'),
-    mork_space_name(Space, _),
+    mork_owns_space(Space),
     member(Capability, [add, remove, match, enumerate, rules, plan]).
 
 %Add an atom to the space. The engine fires the write hooks around
 %metta_add_atom/3, so subscriptions and reflection see MORK writes too:
-metta_foreign_add(Space, Atom) :- mork_require_text_safe(Atom, 'add-atom'/3),
+metta_foreign_add(Space, Atom) :- mork_owns_space(Space),
+                                  mork_require_text_safe(Atom, 'add-atom'/3),
                                   swrite(Atom, S),
                                   mork_call(Space, "queue-atom", S, "OK: queued").
 
@@ -152,6 +173,7 @@ metta_foreign_add_many(Space, Atoms) :- 'mork-add-atoms'(Space, Atoms, true).
 %That is a divergence from the multiset a space is meant to be, and it is on
 %the ADD side rather than this one.
 metta_foreign_remove(Space, Atom, Removed) :-
+    mork_owns_space(Space),
     ( mork_holds(Space, Atom) -> Removed = true ; Removed = false ),
     mork_require_text_safe(Atom, 'remove-atom'/3),
     swrite(Atom, S),
@@ -170,7 +192,8 @@ mork_holds(Space, Atom) :-
 %conjunction per conjunct and answers an unbound pattern through
 %metta_foreign_atoms/2, so joins over this space are the engine's joins,
 %each conjunct answered by MORK.
-metta_foreign_match(Space, Pattern, _Options) :- Pattern_Template = [Pattern, Pattern],
+metta_foreign_match(Space, Pattern, _Options) :- mork_owns_space(Space),
+                                       Pattern_Template = [Pattern, Pattern],
                                        mork_require_text_safe(Pattern_Template, match/4),
                                        swrite(Pattern_Template, MorkPat),
                                        mork_call(Space, "match", MorkPat, Temp),
@@ -215,7 +238,8 @@ mork_query_multi(Space, Conjuncts) :-
     Vars = Values.
 
 %Get all atoms in space, irregard of arity:
-metta_foreign_atoms(Space, Pattern) :- mork_call(Space, "get-atoms", "", Temp),
+metta_foreign_atoms(Space, Pattern) :- mork_owns_space(Space),
+                                       mork_call(Space, "get-atoms", "", Temp),
                                        mork_response_term(Temp, Pattern).
 
 %A response is one atom per line, with a trailing newline to skip.
