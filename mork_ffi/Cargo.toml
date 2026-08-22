@@ -4,9 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-mork-frontend = { path = "../../MORK/frontend" }
-mork-expr = { path = "../../MORK/expr" }
-mork = { path = "../../MORK/kernel" }
+mork-frontend = { path = "../../../../MORK/frontend" }
+mork-expr = { path = "../../../../MORK/expr" }
+mork = { path = "../../../../MORK/kernel" }
+pathmap = { path = "../../../../PathMap", features = ["jemalloc", "arena_compact", "nightly"] }
 # Feature-unifies with PathMap's jemalloc: initial-exec TLS refuses
 # dlopen into a live process ("cannot allocate memory in static TLS
 # block"), which is exactly how an embedding host loads this library
