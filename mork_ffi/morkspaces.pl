@@ -95,7 +95,7 @@ mork_require_text_safe(Term, Operation) :-
 %MORK's byte tag carries a six-bit arity. The parser asserts rather than
 %returning an error at arity 64, so every public crossing proves this shape
 %before handing text to Rust. [source: MORK/expr/src/lib.rs, item_byte/1;
-%commit=WORKTREE]
+%commit=f1dffa91417f9effa55254d1e0bb775ec0deb172]
 mork_representable_term(Term) :-
     (   is_list(Term)
     ->  length(Term, Arity),
@@ -138,7 +138,7 @@ seam:foreign_space(Space) :- mork_owns_space(Space).
 %ordinary removal funnel before destroying the Rust registry entry, so hooks,
 %compiled rules, tables, support edges, and the provider allocation all end in
 %the same space life. [tested: test_a_recycled_mork_name_inherits_nothing;
-%commit=WORKTREE]
+%commit=f1dffa91417f9effa55254d1e0bb775ec0deb172]
 %rules is declared because MORK holds whatever atoms it is given, EQUATIONS
 %included. That is the whole of what the capability asks: the engine compiles
 %an equation added to this space and MORK stores the atom, so a rule here is
