@@ -40,6 +40,7 @@
 :- multifile seam:foreign_match/3.
 :- multifile seam:foreign_capability/2.
 :- multifile seam:foreign_plan/5.
+:- multifile seam:foreign_clear/1.
 
 %MORK spaces address from MeTTa as &mork (the default space) or
 %&mork:<name>, each name its own store inside MORK, created on first
@@ -81,11 +82,27 @@ mork_call(Space, Command, Payload, Response) :-
 %It was wrapped here under a private name until those were declared, which is
 %what an undeclared dependency looks like from the outside.
 mork_require_text_safe(Term, Operation) :-
-    ( metta_unwritable_symbol(Term, Bad)
+    ( \+ mork_representable_term(Term)
+      -> throw(error(domain_error(mork_expression_width, Term),
+                     context(Operation,
+                             'MORK expressions have at most 63 children')))
+    ; metta_unwritable_symbol(Term, Bad)
       -> throw(error(domain_error(mork_text_symbol, Bad),
                      context(Operation,
                              'symbol names containing whitespace, parentheses or quotes, and numbers whose printed form is not read back as the same number, cannot cross the MORK text boundary')))
     ; true ).
+
+%MORK's byte tag carries a six-bit arity. The parser asserts rather than
+%returning an error at arity 64, so every public crossing proves this shape
+%before handing text to Rust. [source: MORK/expr/src/lib.rs, item_byte/1;
+%commit=WORKTREE]
+mork_representable_term(Term) :-
+    (   is_list(Term)
+    ->  length(Term, Arity),
+        Arity =< 63,
+        maplist(mork_representable_term, Term)
+    ;   true
+    ).
 
 %Whether a request is this backend's at all. Every ownership seam below opens
 %with it, which is what an ownership seam asks of a provider: "every provider
@@ -117,10 +134,11 @@ mork_owns_space(Space) :- atom(Space),
 %database and this file owns every read and write of them.
 seam:foreign_space(Space) :- mork_owns_space(Space).
 
-%Four of the five, declared. MORK has no clear, and saying so is what turns
-%(clear &mork) from a silent nothing into a refusal that names the space and
-%the operation. The same ownership test guards this as guards the space
-%itself, so an unrelated space costs one sub_atom/5 to reject.
+%All storage capabilities are declared. Clear removes atoms through the
+%ordinary removal funnel before destroying the Rust registry entry, so hooks,
+%compiled rules, tables, support edges, and the provider allocation all end in
+%the same space life. [tested: test_a_recycled_mork_name_inherits_nothing;
+%commit=WORKTREE]
 %rules is declared because MORK holds whatever atoms it is given, EQUATIONS
 %included. That is the whole of what the capability asks: the engine compiles
 %an equation added to this space and MORK stores the atom, so a rule here is
@@ -132,7 +150,13 @@ seam:foreign_space(Space) :- mork_owns_space(Space).
 %equation nothing added is stored and inert.
 seam:foreign_capability(Space, Capability) :-
     mork_owns_space(Space),
-    member(Capability, [add, remove, match, enumerate, rules, plan]).
+    member(Capability, [add, remove, match, enumerate, clear, rules, plan]).
+
+seam:foreign_clear(Space) :-
+    mork_owns_space(Space),
+    findall(Atom, seam:foreign_atoms(Space, Atom), Atoms),
+    forall(member(Atom, Atoms), 'remove-atom'(Space, Atom, _)),
+    mork_call(Space, "drop-space", "", "OK: dropped").
 
 %What a MORK space's change events promise. at-most-once, and the reason is
 %the paragraph above: an add THROUGH the engine fires the write hooks, so a
@@ -230,6 +254,11 @@ seam:foreign_match(Space, Pattern, _Options) :- mork_owns_space(Space),
 %caller the ordinary split and nothing else.
 seam:foreign_plan(Space, Conjuncts, Conjuncts, [], mork_query_multi(Space, Conjuncts)) :-
     mork_space_name(Space, _),
+    length(Conjuncts, Width),
+    Width =< 62,
+    term_variables(Conjuncts, Variables),
+    length(Variables, VariableCount),
+    VariableCount =< 62,
     forall(member(Conjunct, Conjuncts), mork_plannable_pattern(Conjunct)).
 
 %A pattern MORK can be asked for: written, not a bare variable, and every
@@ -239,6 +268,7 @@ seam:foreign_plan(Space, Conjuncts, Conjuncts, [], mork_query_multi(Space, Conju
 %caller gets the ordinary split and a correct answer either way.
 mork_plannable_pattern(Conjunct) :- nonvar(Conjunct),
                                     Conjunct = [_|_],
+                                    mork_representable_term(Conjunct),
                                     \+ metta_unwritable_symbol(Conjunct, _).
 
 %The claim, answered. One crossing for the whole join, and the row carries the
