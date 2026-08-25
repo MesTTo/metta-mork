@@ -4,7 +4,7 @@
 // Guarantees: scratch allocations grow with the encoded request or answer,
 // and `drop-space` destroys the named registry entry rather than clearing only
 // its visible atoms. [source: MORK/kernel/src/space.rs, Space::query_multi_raw;
-// commit=WORKTREE]
+// commit=d843bb6d17a525c36afd21cab077d63b34447535]
 // Owns resources: GLOBAL_SPACES owns each Space until `drop-space`; OUTBUF owns
 // one reusable answer allocation per calling thread.
 // Guarded by: the GLOBAL_SPACES mutex serializes registry and Space mutation.
