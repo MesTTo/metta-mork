@@ -328,13 +328,27 @@ mork_response_term(Response, Term) :- split_string(Response, "\n", "", Lines),
    ; throw(error(existence_error(procedure, mork/3),
                  context(ShimLib, 'mork/3 did not register on load'))) ).
 
-%The builtins this bridge provides, named where they are defined. The engine
-%registers whatever is declared and knows none of these names; they exist only
-%when this file loads, which is the condition it would otherwise have to test.
-:- multifile seam:backend_builtin/1.
-seam:backend_builtin('mm2-exec').
-seam:backend_builtin('mork-add-atoms').
-seam:backend_builtin('mork-flush').
+%The builtins this bridge provides, named where they are defined and each
+%carrying its effect class. The engine registers whatever is declared and
+%knows none of these names; they exist only when this file loads, which is the
+%condition it would otherwise have to test.
+%
+%Both writes say writesState rather than taking the engine's oracleIO floor,
+%because each body is one named write into a space and that is precisely what
+%the class means: 'mork-add-atoms'/3 above is the seam:foreign_add_many/2
+%implementation, and 'mork-flush'/2 makes queued additions of the same writes
+%visible. A world that covers writesState should run them, and under the
+%unreviewed floor it could not.
+%
+%'mm2-exec'/3 stays oracleIO, and that is a review rather than a default: it
+%runs the MM2 calculus for N steps over rules held as DATA in the space,
+%inside the Rust library, so what a call reaches is decided at run time by
+%content the engine never sees and cannot bound. Tightening it would need the
+%calculus itself to carry an effect, not this line.
+:- multifile seam:backend_builtin/2.
+seam:backend_builtin('mm2-exec', oracleIO).
+seam:backend_builtin('mork-add-atoms', writesState).
+seam:backend_builtin('mork-flush', writesState).
 
 %This backend's smoke test, run by the CLI demo. It was mork_test/0 called by
 %name from engine/main.pl, which is why that file had a `mork` branch at all.
