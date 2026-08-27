@@ -276,11 +276,11 @@ mork_plannable_pattern(Conjunct) :- nonvar(Conjunct),
 %term on both sides of the call.
 mork_query_multi(Space, Conjuncts) :-
     term_variables(Conjuncts, Vars),
-    Row = ['petta-join-row'|Vars],
+    Row = ['metta-join-row'|Vars],
     swrite([[','|Conjuncts], Row], Payload),
     mork_call(Space, "query-multi", Payload, Response),
     mork_response_term(Response, Answer),
-    Answer = ['petta-join-row'|Values],
+    Answer = ['metta-join-row'|Values],
     Vars = Values.
 
 %Get all atoms in space, irregard of arity:
@@ -345,10 +345,10 @@ mork_response_term(Response, Term) :- split_string(Response, "\n", "", Lines),
 %inside the Rust library, so what a call reaches is decided at run time by
 %content the engine never sees and cannot bound. Tightening it would need the
 %calculus itself to carry an effect, not this line.
-:- multifile seam:backend_builtin/2.
-seam:backend_builtin('mm2-exec', oracleIO).
-seam:backend_builtin('mork-add-atoms', writesState).
-seam:backend_builtin('mork-flush', writesState).
+:- multifile seam:extension_builtin/2.
+seam:extension_builtin('mm2-exec', oracleIO).
+seam:extension_builtin('mork-add-atoms', writesState).
+seam:extension_builtin('mork-flush', writesState).
 
 %This backend's smoke test, run by the CLI demo. It was mork_test/0 called by
 %name from engine/main.pl, which is why that file had a `mork` branch at all.
