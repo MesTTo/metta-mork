@@ -134,6 +134,20 @@ mork_owns_space(Space) :- atom(Space),
 %database and this file owns every read and write of them.
 seam:foreign_space(Space) :- mork_owns_space(Space).
 
+%And the claim that says so to the engine rather than only to the seam. The
+%extent is the NAMESPACE, not a name, because that is what mork_owns_space/1
+%above actually decides: every space beginning &mork is this backend's, each
+%`&mork:<name>` store is created inside MORK on first use, and there is no
+%per-name attach point an exact claim could hang on. Recording `&mork` alone
+%would leave every named store unclaimed, which is exactly the collision the
+%door exists to catch.
+%
+%At LOAD, because loading is when this provider goes live: the engine consults
+%this file only where the seat's needs hold, so a tree without the FFI takes no
+%claim at all. Re-claiming under unregister_metta_extension/1 and a reload is
+%the same owner and the same extent, which the door treats as idempotent.
+:- metta_claim_space(prefix('&mork'), mork).
+
 %All storage capabilities are declared. Clear removes atoms through the
 %ordinary removal funnel before destroying the Rust registry entry, so hooks,
 %compiled rules, tables, support edges, and the provider allocation all end in
