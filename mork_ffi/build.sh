@@ -5,10 +5,20 @@
 # Assumes:
 #   - a nightly Rust toolchain, because PathMap is built here with its
 #     `nightly` feature (backends/mork/mork_ffi/Cargo.toml:10)
-#   - pkg-config can answer for swipl. Not every SWI build installs swipl.pc;
-#     where it is missing this says so by name, which is what the bare
-#     `$(pkg-config ...)` could not: it expanded to nothing and gcc failed on
-#     a missing SWI-Prolog.h, blaming the wrong thing.
+#   - swipl-ld, which ships with SWI-Prolog and is therefore available wherever
+#     the engine is. morklib.so is loaded with use_foreign_library/1
+#     (morkspaces.pl:323), so it is an extension loaded INTO SWI, which is
+#     exactly what swipl-ld builds and what engine/reader.so and the chapter 19
+#     C examples already use (check.sh). This used to be
+#     `gcc -shared -fPIC ... $(pkg-config --cflags --libs swipl)`, the only
+#     place in the tree asking pkg-config, and not every SWI build installs
+#     swipl.pc: where it is absent that expanded to NOTHING and gcc failed on a
+#     missing SWI-Prolog.h, blaming the wrong thing. Measured 2026-08-28: both
+#     spellings produce a 15768-byte object exporting the same ten symbols and
+#     the same install hook.
+#     bindings/cetta keeps --dump-runtime-variables instead, and correctly: it
+#     calls PL_initialise (cetta.c:1353) and so EMBEDS SWI in a C program,
+#     the opposite direction, which swipl-ld does not build.
 # Guarantees:
 #   - "Successfully built" is printed only when both artefacts exist and the
 #     cdylib really exports rust_mork. Without `set -e` this script ran every
@@ -34,14 +44,19 @@ HERE=$(cd -- "$(dirname -- "$0")" && pwd)
 cd "$HERE"
 
 missing=''
-for tool in cargo nm pkg-config gcc; do
+for tool in cargo nm swipl-ld; do
     command -v "$tool" >/dev/null 2>&1 || missing="$missing $tool"
 done
+# swipl-ld drives a C compiler rather than being one, so a tree with swipl-ld
+# and no compiler fails inside it. check.sh's build_engine_reader tests the same
+# pair for the same reason.
+if ! command -v cc >/dev/null 2>&1 &&
+   ! command -v gcc >/dev/null 2>&1 &&
+   ! command -v clang >/dev/null 2>&1; then
+    missing="$missing a-C-compiler(cc,gcc-or-clang)"
+fi
 if command -v cargo >/dev/null 2>&1 && ! cargo +nightly --version >/dev/null 2>&1; then
     missing="$missing rust-nightly-toolchain(rustup toolchain install nightly)"
-fi
-if command -v pkg-config >/dev/null 2>&1 && ! pkg-config --exists swipl; then
-    missing="$missing swipl.pc(SWI-Prolog development files)"
 fi
 if [ -n "$missing" ]; then
     echo "mork_ffi/build.sh: not built, missing:$missing" >&2
@@ -60,6 +75,6 @@ if ! nm -D ./target/release/libmork_ffi.so | grep -q ' rust_mork$'; then
     exit 1
 fi
 
-gcc -shared -fPIC -o morklib.so mork.c $(pkg-config --cflags --libs swipl)
+swipl-ld -shared -o morklib.so mork.c
 
 echo "Successfully built mork_ffi"
