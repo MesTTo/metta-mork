@@ -4,7 +4,7 @@
 #   rather than failing inside a compiler.
 # Assumes:
 #   - a nightly Rust toolchain, because PathMap is built here with its
-#     `nightly` feature (backends/mork/mork_ffi/Cargo.toml:10)
+#     `nightly` feature (extensions/mork/mork_ffi/Cargo.toml:10)
 #   - swipl-ld, which ships with SWI-Prolog and is therefore available wherever
 #     the engine is. morklib.so is loaded with use_foreign_library/1
 #     (morkspaces.pl:323), so it is an extension loaded INTO SWI, which is
@@ -16,7 +16,7 @@
 #     missing SWI-Prolog.h, blaming the wrong thing. Measured 2026-08-28: both
 #     spellings produce a 15768-byte object exporting the same ten symbols and
 #     the same install hook.
-#     bindings/cetta keeps --dump-runtime-variables instead, and correctly: it
+#     extensions/cetta keeps --dump-runtime-variables instead, and correctly: it
 #     calls PL_initialise (cetta.c:1353) and so EMBEDS SWI in a C program,
 #     the opposite direction, which swipl-ld does not build.
 # Guarantees:
