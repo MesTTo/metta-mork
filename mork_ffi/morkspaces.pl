@@ -276,11 +276,11 @@ mork_plannable_pattern(Conjunct) :- nonvar(Conjunct),
 %term on both sides of the call.
 mork_query_multi(Space, Conjuncts) :-
     term_variables(Conjuncts, Vars),
-    Row = ['petta-join-row'|Vars],
+    Row = ['metta-join-row'|Vars],
     swrite([[','|Conjuncts], Row], Payload),
     mork_call(Space, "query-multi", Payload, Response),
     mork_response_term(Response, Answer),
-    Answer = ['petta-join-row'|Values],
+    Answer = ['metta-join-row'|Values],
     Vars = Values.
 
 %Get all atoms in space, irregard of arity:
