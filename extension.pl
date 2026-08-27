@@ -1,4 +1,4 @@
-% This backend's control file; see bindings/python/extension.pl for the model.
+% This backend's control file; see extensions/python/extension.pl for the model.
 %
 % The artefact is what `sh build.sh` produces, and its absence means the
 % backend was not built rather than that anything is wrong. The predicate need
