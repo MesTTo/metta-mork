@@ -23,9 +23,18 @@
 %engine loads it at all. That one asks "can I run", and refuses to be half
 %loaded however it was reached, including the git-import! flow and an embedded
 %process that never consulted this file.
+%The artefact's PRESENCE is not enough on a platform that cannot open a shared
+%object at all. A WebAssembly build mounts this checkout's files, so the .so is
+%there to be seen and open_shared_object/3 does not exist to open it; the
+%backend then raised two ERROR lines through every boot of the Node binding,
+%which its old stderr parser matched neither of and absorbed in silence. That
+%is not the half-built case this file refuses to skip: the build is fine and
+%the platform has no dynamic linking, so the honest answer is the same as an
+%unbuilt tree's.
 :- prolog_load_context(directory, Dir),
    directory_file_path(Dir, 'mork_ffi/target/release/libmork_ffi.so', Artefact),
-   (   exists_file(Artefact)
+   (   exists_file(Artefact),
+       current_predicate(open_shared_object/3)
    ->  directory_file_path(Dir, 'mork_ffi/morkspaces.pl', Backend),
        ensure_loaded(Backend)
    ;   true
