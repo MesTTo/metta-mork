@@ -55,4 +55,19 @@ and the MORK benchmarks will not run" >&2
     exit 0
 fi
 
+# One boot before the measurement, which is the same line check.sh runs before
+# its lanes and for two reasons at once. engine/main.pl loads engine/qlf_boot.pl,
+# which PURGES a .qlf set older than any source: the engine's units are
+# consulted by umbrellas, so a unit edit leaves the umbrella's artifact fresh by
+# mtime and the workload would otherwise measure the previous compile. And the
+# boot REGENERATES the set, which is what the pins were taken against.
+#
+# Both halves are load-bearing and each fails differently. Loading the purge
+# inside benchmarks/workload.pl instead puts it in the MEASURED process, worth
+# +25,600 instructions on mork-native-match-first-500 and -470 on
+# mork-window-floor. Purging without regenerating measures a SOURCE boot, which
+# moves mork-batch-add-500 by -3.6% and mork-native-add-2000 by +1.2%, both far
+# outside their 1% band [measured 2026-08-29, one A/B per half].
+swipl -g halt -s "$HERE/../../engine/main.pl" -- extensions >/dev/null 2>&1 || true
+
 exec "$PY" "$HERE/benchmarks/bench.py" "$@"

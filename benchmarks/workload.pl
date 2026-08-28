@@ -46,7 +46,10 @@
 %   Hacks: None
 %   Future Enhancements: None
 
-:- ensure_loaded('../../../engine/qlf_boot.pl').
+% qlf-freshness-exempt: this file IS the measured process, so loading the
+% purge here is boot content the pins were not taken with, worth +25,600
+% instructions on mork-native-match-first-500. extensions/mork/bench.sh
+% runs the purge in a separate process before the measurement instead.
 :- ensure_loaded('../../../engine/metta.pl').
 
 %The rows every case works over: a path graph, so an open match answers Size
