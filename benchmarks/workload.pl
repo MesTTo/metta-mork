@@ -46,6 +46,7 @@
 %   Hacks: None
 %   Future Enhancements: None
 
+:- ensure_loaded('../../../engine/qlf_boot.pl').
 :- ensure_loaded('../../../engine/metta.pl').
 
 %The rows every case works over: a path graph, so an open match answers Size
