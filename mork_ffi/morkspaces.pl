@@ -370,8 +370,8 @@ seam:extension_builtin('mork-flush', writesState).
 %add-atom answers unit ([]), the arbiter's doctrine; demanding the old true
 %made this fail silently inside the demo's forall from the day that changed.
 seam:backend_selftest :-
-    'add-atom'('&mork', [friend,sam,tim], []),
-    'add-atom'('&mork', [friend,sam,joe], []),
+    'add-atom'('&mork', [friend,sam,tim], true),
+    'add-atom'('&mork', [friend,sam,joe], true),
     findall(C, match('&mork', [friend,sam,X], [friend,sam,X], C), Cs),
     format(string(SC), "MORK query result: ~w ~n", [Cs]),
     writeln(SC).
