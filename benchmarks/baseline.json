@@ -1,250 +1,250 @@
 {
   "benchmarks": {
     "mork-batch-add-2000": {
-      "cpu_seconds_per_operation": 1.1680250000000001e-06,
+      "cpu_seconds_per_operation": 1.1668955e-06,
       "inferences": 68029,
       "instruction_noise_percent": 1.0,
-      "instructions": 50995795,
+      "instructions": 51123702,
       "operations": 2000,
       "unit": "operations"
     },
     "mork-batch-add-500": {
-      "cpu_seconds_per_operation": 1.5672e-06,
+      "cpu_seconds_per_operation": 1.50972e-06,
       "inferences": 17029,
       "instruction_noise_percent": 1.0,
-      "instructions": 13119811,
+      "instructions": 13160368,
       "operations": 500,
       "unit": "operations"
     },
     "mork-batch-add-8000": {
-      "cpu_seconds_per_operation": 1.1594940000000001e-06,
+      "cpu_seconds_per_operation": 1.1237815000000002e-06,
       "inferences": 272029,
       "instruction_noise_percent": 1.0,
-      "instructions": 206156892,
+      "instructions": 206668543,
       "operations": 8000,
       "unit": "operations"
     },
     "mork-flush-2000": {
-      "cpu_seconds_per_operation": 8.767e-08,
+      "cpu_seconds_per_operation": 8.559499999999999e-08,
       "inferences": 19,
       "instruction_noise_percent": 1.0,
-      "instructions": 3133476,
+      "instructions": 3133538,
       "operations": 2000,
       "unit": "operations"
     },
     "mork-flush-500": {
-      "cpu_seconds_per_operation": 1.0914e-07,
+      "cpu_seconds_per_operation": 1.0284e-07,
       "inferences": 19,
       "instruction_noise_percent": 1.0,
-      "instructions": 793621,
+      "instructions": 793800,
       "operations": 500,
       "unit": "operations"
     },
     "mork-flush-8000": {
-      "cpu_seconds_per_operation": 9.37275e-08,
+      "cpu_seconds_per_operation": 8.315375000000001e-08,
       "inferences": 19,
       "instruction_noise_percent": 1.0,
-      "instructions": 12722447,
+      "instructions": 12722471,
       "operations": 8000,
       "unit": "operations"
     },
     "mork-mork-match-first-2000": {
-      "cpu_seconds_per_operation": 7.3083e-06,
+      "cpu_seconds_per_operation": 7.4366e-06,
       "inferences": 13307,
       "instruction_noise_percent": 1.0,
-      "instructions": 14191739,
+      "instructions": 14201084,
       "operations": 100,
       "unit": "queries"
     },
     "mork-mork-match-first-500": {
-      "cpu_seconds_per_operation": 7.4902e-06,
+      "cpu_seconds_per_operation": 7.4447999999999994e-06,
       "inferences": 13307,
       "instruction_noise_percent": 1.0,
-      "instructions": 14148462,
+      "instructions": 14159614,
       "operations": 100,
       "unit": "queries"
     },
     "mork-mork-match-first-8000": {
-      "cpu_seconds_per_operation": 7.4153e-06,
+      "cpu_seconds_per_operation": 7.3552e-06,
       "inferences": 13307,
       "instruction_noise_percent": 1.0,
-      "instructions": 14187373,
+      "instructions": 14198642,
       "operations": 100,
       "unit": "queries"
     },
     "mork-mork-match-last-2000": {
-      "cpu_seconds_per_operation": 7.529932e-05,
+      "cpu_seconds_per_operation": 7.375752e-05,
       "inferences": 13307,
       "instruction_noise_percent": 1.0,
-      "instructions": 185130649,
+      "instructions": 185141813,
       "operations": 100,
       "unit": "queries"
     },
     "mork-mork-match-last-500": {
-      "cpu_seconds_per_operation": 2.742801e-05,
+      "cpu_seconds_per_operation": 2.699951e-05,
       "inferences": 13307,
       "instruction_noise_percent": 1.0,
-      "instructions": 64496300,
+      "instructions": 64507593,
       "operations": 100,
       "unit": "queries"
     },
     "mork-mork-match-last-8000": {
-      "cpu_seconds_per_operation": 0.00033222487000000004,
+      "cpu_seconds_per_operation": 0.00032717587,
       "inferences": 13307,
       "instruction_noise_percent": 1.0,
-      "instructions": 847066495,
+      "instructions": 847077703,
       "operations": 100,
       "unit": "queries"
     },
     "mork-mork-match-open-2000": {
-      "cpu_seconds_per_operation": 1.320395e-06,
+      "cpu_seconds_per_operation": 1.292865e-06,
       "inferences": 20126,
       "instruction_noise_percent": 1.0,
-      "instructions": 56487637,
+      "instructions": 56488010,
       "operations": 2000,
       "unit": "operations"
     },
     "mork-mork-match-open-500": {
-      "cpu_seconds_per_operation": 1.2883799999999999e-06,
+      "cpu_seconds_per_operation": 1.2862800000000002e-06,
       "inferences": 5126,
       "instruction_noise_percent": 1.0,
-      "instructions": 13994933,
+      "instructions": 13995036,
       "operations": 500,
       "unit": "operations"
     },
     "mork-mork-match-open-8000": {
-      "cpu_seconds_per_operation": 1.38042775e-06,
+      "cpu_seconds_per_operation": 1.2831089999999999e-06,
       "inferences": 80126,
       "instruction_noise_percent": 1.0,
-      "instructions": 227531036,
+      "instructions": 227530834,
       "operations": 8000,
       "unit": "operations"
     },
     "mork-native-add-2000": {
-      "cpu_seconds_per_operation": 8.539105e-07,
+      "cpu_seconds_per_operation": 6.8415e-07,
       "inferences": 30034,
       "instruction_noise_percent": 1.0,
-      "instructions": 22609116,
+      "instructions": 22610106,
       "operations": 2000,
       "unit": "operations"
     },
     "mork-native-add-500": {
-      "cpu_seconds_per_operation": 7.449e-07,
+      "cpu_seconds_per_operation": 7.676e-07,
       "inferences": 7534,
       "instruction_noise_percent": 1.0,
-      "instructions": 5666293,
+      "instructions": 5666592,
       "operations": 500,
       "unit": "operations"
     },
     "mork-native-add-8000": {
-      "cpu_seconds_per_operation": 8.1382025e-07,
+      "cpu_seconds_per_operation": 7.32630125e-07,
       "inferences": 120034,
       "instruction_noise_percent": 4.0,
-      "instructions": 95279496,
+      "instructions": 95391812,
       "operations": 8000,
       "unit": "operations"
     },
     "mork-native-match-first-2000": {
-      "cpu_seconds_per_operation": 6.269e-07,
+      "cpu_seconds_per_operation": 6.402999999999999e-07,
       "inferences": 2107,
       "instruction_noise_percent": 1.0,
-      "instructions": 1372503,
+      "instructions": 1378950,
       "operations": 100,
       "unit": "queries"
     },
     "mork-native-match-first-500": {
-      "cpu_seconds_per_operation": 6.263999999999999e-07,
+      "cpu_seconds_per_operation": 6.125e-07,
       "inferences": 2107,
       "instruction_noise_percent": 1.0,
-      "instructions": 1372700,
+      "instructions": 1378940,
       "operations": 100,
       "unit": "queries"
     },
     "mork-native-match-first-8000": {
-      "cpu_seconds_per_operation": 6.423e-07,
+      "cpu_seconds_per_operation": 6.443e-07,
       "inferences": 2107,
       "instruction_noise_percent": 1.0,
-      "instructions": 1374403,
+      "instructions": 1380850,
       "operations": 100,
       "unit": "queries"
     },
     "mork-native-match-last-2000": {
-      "cpu_seconds_per_operation": 6.26e-07,
+      "cpu_seconds_per_operation": 6.402e-07,
       "inferences": 2107,
       "instruction_noise_percent": 1.0,
-      "instructions": 1383303,
+      "instructions": 1389750,
       "operations": 100,
       "unit": "queries"
     },
     "mork-native-match-last-500": {
-      "cpu_seconds_per_operation": 6.134e-07,
+      "cpu_seconds_per_operation": 6.199e-07,
       "inferences": 2107,
       "instruction_noise_percent": 1.0,
-      "instructions": 1383500,
+      "instructions": 1389740,
       "operations": 100,
       "unit": "queries"
     },
     "mork-native-match-last-8000": {
-      "cpu_seconds_per_operation": 6.397999999999999e-07,
+      "cpu_seconds_per_operation": 6.287999999999999e-07,
       "inferences": 2107,
       "instruction_noise_percent": 1.0,
-      "instructions": 1385203,
+      "instructions": 1391650,
       "operations": 100,
       "unit": "queries"
     },
     "mork-native-match-open-2000": {
-      "cpu_seconds_per_operation": 9.5945e-08,
+      "cpu_seconds_per_operation": 9.341499999999999e-08,
       "inferences": 6021,
       "instruction_noise_percent": 1.0,
-      "instructions": 5238134,
+      "instructions": 5238246,
       "operations": 2000,
       "unit": "operations"
     },
     "mork-native-match-open-500": {
-      "cpu_seconds_per_operation": 9.632e-08,
+      "cpu_seconds_per_operation": 9.653999999999999e-08,
       "inferences": 1521,
       "instruction_noise_percent": 1.0,
-      "instructions": 1317126,
+      "instructions": 1317235,
       "operations": 500,
       "unit": "operations"
     },
     "mork-native-match-open-8000": {
-      "cpu_seconds_per_operation": 9.58425e-08,
+      "cpu_seconds_per_operation": 9.578125e-08,
       "inferences": 24021,
       "instruction_noise_percent": 1.0,
-      "instructions": 20921832,
+      "instructions": 20921942,
       "operations": 8000,
       "unit": "operations"
     },
     "mork-per-atom-add-2000": {
-      "cpu_seconds_per_operation": 3.999931e-06,
+      "cpu_seconds_per_operation": 4.0240605000000004e-06,
       "inferences": 142014,
       "instruction_noise_percent": 1.0,
-      "instructions": 155590923,
+      "instructions": 155686260,
       "operations": 2000,
       "unit": "operations"
     },
     "mork-per-atom-add-500": {
-      "cpu_seconds_per_operation": 4.24988e-06,
+      "cpu_seconds_per_operation": 4.3588000000000005e-06,
       "inferences": 35514,
       "instruction_noise_percent": 1.0,
-      "instructions": 39142852,
+      "instructions": 38245273,
       "operations": 500,
       "unit": "operations"
     },
     "mork-per-atom-add-8000": {
-      "cpu_seconds_per_operation": 3.988910875000001e-06,
+      "cpu_seconds_per_operation": 4.009734625e-06,
       "inferences": 568014,
       "instruction_noise_percent": 1.0,
-      "instructions": 622800575,
+      "instructions": 623184249,
       "operations": 8000,
       "unit": "operations"
     },
     "mork-window-floor": {
-      "cpu_seconds_per_operation": 6.8e-07,
+      "cpu_seconds_per_operation": 7e-07,
       "inferences": 5,
       "instruction_noise_percent": 1.0,
-      "instructions": 29068,
+      "instructions": 28237,
       "operations": 1,
       "unit": "windows"
     }
