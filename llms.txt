@@ -1,0 +1,64 @@
+# Spaces on MORK
+
+> Put a space's atoms in MORK's Rust trie instead of the engine's own store.
+> You reach it by NAME: a space called `&mork` is one. This file is how to USE
+> the seat; the repository root's llms.txt covers everything else.
+
+## Build
+
+```sh
+sh extensions/mork/build.sh
+```
+
+Needs `cargo`. Without the artefacts the seat does not load, and a program that
+needs it is told so by name rather than failing at the call:
+
+```metta
+!(require-extension! mork)
+```
+
+## Using it
+
+Any space whose name begins `&mork` is stored in MORK:
+
+```metta
+!(add-atom &mork (parent alice bob))
+!(match &mork (parent $x bob) $x)
+```
+
+The three builtins the seat adds:
+
+| builtin | what it does |
+|---|---|
+| `(mork-add-atoms &mork ...)` | add many atoms in ONE crossing |
+| `(mork-flush &mork)` | push buffered writes through |
+| `(mm2-exec &mork ...)` | run MM2 steps inside MORK itself |
+
+`lib_mm2` is the MeTTa-level surface over those, five operators over `&mork`:
+
+```metta
+!(import! &self (library lib_mm2))
+```
+
+## When it is worth it
+
+Measured at 500, 2000 and 8000 atoms against a native space:
+
+| | 500 | 2000 | 8000 |
+|---|---|---|---|
+| batch add against one add per atom | 0.34x | 0.33x | 0.33x |
+| writing, against a native space | 2.31x | 2.26x | 2.20x |
+| query with the FIRST argument bound | 10.31x | 10.34x | 10.32x |
+| query with the LAST argument bound | 46.62x | 133.83x | 611.51x |
+
+Read that as the store's shape. MORK holds an atom as a PATH, so a bound first
+argument is a prefix it descends to in constant time, and a bound last argument
+is a constraint it can only check after walking. Use the batch door, which is
+worth three of the per-atom door at every size, and write queries that bind
+early arguments.
+
+## Where to read next
+
+- `extensions/mork/README.md` explains the seat and its needs.
+- `lib/lib_mm2/lib_mm2.metta` is the operator surface, and its first line is
+  the `require-extension!` above.
