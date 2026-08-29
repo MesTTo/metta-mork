@@ -16,8 +16,8 @@
 #     missing SWI-Prolog.h, blaming the wrong thing. Measured 2026-08-28: both
 #     spellings produce a 15768-byte object exporting the same ten symbols and
 #     the same install hook.
-#     extensions/cetta keeps --dump-runtime-variables instead, and correctly: it
-#     calls PL_initialise (cetta.c:1353) and so EMBEDS SWI in a C program,
+#     extensions/cmetta keeps --dump-runtime-variables instead, and correctly: it
+#     calls PL_initialise (cmetta.c:1353) and so EMBEDS SWI in a C program,
 #     the opposite direction, which swipl-ld does not build.
 # Guarantees:
 #   - "Successfully built" is printed only when both artefacts exist and the
