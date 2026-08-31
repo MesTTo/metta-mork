@@ -24,17 +24,12 @@ set -eu
 
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
-PY=${CHECK_PY:-}
+METTA_ROOT="$HERE/../.."
+. "$HERE/../../select-python.sh"
 if [ -z "$PY" ]; then
-    for candidate in "$HOME/Dev/.venv-pypetta/bin/python" \
-                     "$HERE/../../.venv/bin/python" python3; do
-        if command -v "$candidate" >/dev/null 2>&1; then PY="$candidate"; break; fi
-    done
-fi
-command -v "$PY" >/dev/null 2>&1 || {
     echo "note: no python found (set CHECK_PY), the MORK benchmarks will not run" >&2
     exit 0
-}
+fi
 
 for artefact in mork_ffi/target/release/libmork_ffi.so mork_ffi/morklib.so; do
     if [ ! -f "$HERE/$artefact" ]; then
