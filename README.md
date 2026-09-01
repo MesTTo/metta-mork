@@ -82,7 +82,7 @@ sh extensions/mork/test.sh
 `tests/mork_seat.plt` covers the three builtins, the claim over the namespace,
 and the failure discipline that lets the next provider's clause run for a space
 this seat does not own. Every test in it is conditioned on the seat being
-loaded, so an unbuilt tree skips them — which is why `test.sh` says which
+loaded, so an unbuilt tree skips them. That is why `test.sh` says which
 configuration it ran and fails a built tree that reported anything less than the
 whole file.
 
