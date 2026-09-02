@@ -14,7 +14,7 @@
       "cpu_seconds_per_operation": 1.2309000000000001e-06,
       "inferences": 17529,
       "instruction_noise_percent": 1.0,
-      "instructions": 12998133,
+      "instructions": 14032188,
       "operations": 500,
       "unit": "operations"
     },
@@ -68,7 +68,7 @@
       "cpu_seconds_per_operation": 8.68581e-06,
       "inferences": 13507,
       "instruction_noise_percent": 1.0,
-      "instructions": 14665909,
+      "instructions": 14169858,
       "operations": 100,
       "unit": "queries"
     },
@@ -140,7 +140,7 @@
       "cpu_seconds_per_operation": 7.778955e-07,
       "inferences": 30033,
       "instruction_noise_percent": 1.0,
-      "instructions": 23945475,
+      "instructions": 22980805,
       "operations": 2000,
       "unit": "operations"
     },
@@ -149,7 +149,7 @@
       "cpu_seconds_per_operation": 7.6578e-07,
       "inferences": 7533,
       "instruction_noise_percent": 1.0,
-      "instructions": 6002400,
+      "instructions": 5759122,
       "operations": 500,
       "unit": "operations"
     },
@@ -158,7 +158,7 @@
       "cpu_seconds_per_operation": 7.06280125e-07,
       "inferences": 120033,
       "instruction_noise_percent": 4.0,
-      "instructions": 100754247,
+      "instructions": 96784274,
       "operations": 8000,
       "unit": "operations"
     },
@@ -167,7 +167,7 @@
       "cpu_seconds_per_operation": 5.334e-07,
       "inferences": 1707,
       "instruction_noise_percent": 1.0,
-      "instructions": 1180283,
+      "instructions": 1194638,
       "operations": 100,
       "unit": "queries"
     },
@@ -176,7 +176,7 @@
       "cpu_seconds_per_operation": 5.177e-07,
       "inferences": 1707,
       "instruction_noise_percent": 1.0,
-      "instructions": 1180273,
+      "instructions": 1194628,
       "operations": 100,
       "unit": "queries"
     },
@@ -185,7 +185,7 @@
       "cpu_seconds_per_operation": 5.761e-07,
       "inferences": 1707,
       "instruction_noise_percent": 1.0,
-      "instructions": 1182183,
+      "instructions": 1196537,
       "operations": 100,
       "unit": "queries"
     },
@@ -194,7 +194,7 @@
       "cpu_seconds_per_operation": 5.227e-07,
       "inferences": 1707,
       "instruction_noise_percent": 1.0,
-      "instructions": 1191083,
+      "instructions": 1205438,
       "operations": 100,
       "unit": "queries"
     },
@@ -203,7 +203,7 @@
       "cpu_seconds_per_operation": 5.224e-07,
       "inferences": 1707,
       "instruction_noise_percent": 1.0,
-      "instructions": 1191073,
+      "instructions": 1205428,
       "operations": 100,
       "unit": "queries"
     },
@@ -212,7 +212,7 @@
       "cpu_seconds_per_operation": 5.611e-07,
       "inferences": 1707,
       "instruction_noise_percent": 1.0,
-      "instructions": 1192983,
+      "instructions": 1207338,
       "operations": 100,
       "unit": "queries"
     },
@@ -275,7 +275,7 @@
       "cpu_seconds_per_operation": 8.2e-07,
       "inferences": 5,
       "instruction_noise_percent": 1.0,
-      "instructions": 28828,
+      "instructions": 28313,
       "operations": 1,
       "unit": "windows"
     }
@@ -288,6 +288,7 @@
   },
   "counter_policy": "stats().inferences minimum of three and fixed two-point growth slopes decide; wall time advises",
   "instruction_policy": "perf instructions:u minimum of three, one percent noise allowance unless a row declares its own beside the measurement that justified it",
+  "p43_loaded_image_repin_comment": "RE-PINNED 2026-09-02 after static contract discharge changed the engine image loaded beside MORK. Every inference count is byte-identical before and after, so no MORK operation performs more logical work. Equal-length q42/p43 controls isolate the deterministic instruction movements: batch-add-500 12998044 to 14024157 (+7.895%), native-add-500 6001006 to 5758648 (-4.039%), native-add-2000 23944355 to 22981049 (-4.023%), and mork-match-first-500 14665892 to 14173613 (-3.357%). The six bound native-match rows move by the same fixed 14310 to 14313 instructions, +1.200% to +1.212%, at 500, 2000 and 8000 atoms. The 500-only batch and MORK-match shifts are fixed process costs that amortize below the band at larger sizes. A second current-checkout comparison also places native-add-8000 below its old 4% band at 96654437, so its pin moves 100754247 to the update run's 96784274; the checkout-local control-window floor moves 28828 to 28313. Only the twelve rows that left their bands are updated, and CPU readings under shared load remain at their earlier values. [measured: min-of-three controlled instructions and inference counts before and after P43; command=CHECK_PY=/home/user/Dev/.venv-pypetta/bin/python sh extensions/mork/bench.sh --update; fixture=equal-length q42 and p43 worktrees with libmork_ffi.so and morklib.so present; commit=WORKTREE]",
   "measurement": {
     "band": "one percent unless a row declares its own. mork-native-add-8000 declares four: its minimum moved 1.605% across four runs and its samples spread 1.992% within one, where every other row moved under 0.240%. Adding 8000 clauses to a dynamic predicate grows SWI's clause store and its just-in-time index across resize thresholds, and where those land depends on allocation rather than on the workload.",
     "loadavg_while_pinning": "7.5 to 12.3 on a 32 core box",
