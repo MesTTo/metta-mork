@@ -1,6 +1,6 @@
 <!--
-Purpose: document the MORK seat: what it provides, what it needs, and how to build it.
-Guarantees: every name here is one the seat registers or a path it ships
+Purpose: document the MORK extension: what it provides, what it needs, and how to build it.
+Guarantees: every name here is one the extension registers or a path it ships
   [source: extensions/mork/extension.pl; extensions/mork/mork_ffi/morkspaces.pl].
 -->
 
@@ -9,11 +9,11 @@ Guarantees: every name here is one the seat registers or a path it ships
 MORK is a storage backend. It puts the atoms of a named space in
 [MORK](https://github.com/trueagi-io/MORK)'s Rust trie instead of in the
 engine's own store, and it reaches it over a text FFI protocol through a
-shared object this seat builds.
+shared object this extension builds.
 
-Nothing in the engine names it. It arrives the way every seat arrives, through
+Nothing in the engine names it. It arrives the way every extension arrives, through
 `seam:foreign_space/1`, so the engine asks the seam who owns a space name and
-MORK answers for its own. A space this seat does not own leaves every ownership
+MORK answers for its own. A space this extension does not own leaves every ownership
 hook by FAILING rather than refusing, which is what lets the next provider's
 clause run.
 
@@ -37,11 +37,11 @@ directive that throws and keeps consulting, so before the second need was
 declared a tree carrying only the first reported a live backend whose every
 call was `Unknown procedure: mork/3`, on every boot, quietly.
 
-The third need is the platform door. A WebAssembly build mounts this
+The third need is the platform itself. A WebAssembly build mounts this
 checkout's files, so the `.so` is there to be SEEN while
 `open_shared_object/3` does not exist to open it. The build is fine and the
 platform has no dynamic linking, so the honest answer is the same as an unbuilt
-tree's: the seat loads nothing and says nothing.
+tree's: the extension loads nothing and says nothing.
 
 ## Building it
 
@@ -49,7 +49,7 @@ tree's: the seat loads nothing and says nothing.
 sh extensions/mork/build.sh
 ```
 
-It needs `cargo`. Without the artefact the seat simply does not load, and a
+It needs `cargo`. Without the artefact the extension simply does not load, and a
 program that needs it is told so by name rather than failing at the call:
 
 ```metta
@@ -81,19 +81,19 @@ sh extensions/mork/test.sh
 
 `tests/mork_seat.plt` covers the three builtins, the claim over the namespace,
 and the failure discipline that lets the next provider's clause run for a space
-this seat does not own. Every test in it is conditioned on the seat being
+this extension does not own. Every test in it is conditioned on the extension being
 loaded, so an unbuilt tree skips them. That is why `test.sh` says which
 configuration it ran and fails a built tree that reported anything less than the
 whole file.
 
 `tests/test_missing_artefacts.sh` covers what a built tree cannot reach. It
-builds a scratch tree of symlinks whose seat is the shipped `extension.pl` and
+builds a scratch tree of symlinks whose extension is the shipped `extension.pl` and
 whose artefact is genuinely absent, so the loader's own `exists_file` check is
 what runs, and then asks for the three properties an absent backend owes: the
 boot writes nothing to either stream, the unmet need is recorded by name, and
-`!(require-extension! mork)` refuses naming the seat, the missing file and
+`!(require-extension! mork)` refuses naming the extension, the missing file and
 `extensions/mork/build.sh`. Its third configuration is a negative control: the
-same tree under a control file declaring one artefact, which is what this seat
+same tree under a control file declaring one artefact, which is what this extension
 shipped until 2026-08-28, and there the suite above has to go red.
 
 ## Measuring it
@@ -124,7 +124,7 @@ What the comparison says, measured 2026-08-28 at 500, 2000 and 8000 atoms:
 | MORK against native, last argument bound | 46.62x | 133.83x | 611.51x |
 | MORK against native, every row | 10.63x | 10.79x | 10.88x |
 
-The batch door is worth three of the per-atom door and stays worth it as the
+Writing in batches is worth three of the per-atom form and stays worth it as the
 load grows. Everything else is a flat multiple of a native space except the
 last-argument query, and that one is the shape of the store: MORK holds an atom
 as a PATH, so a bound first argument is a prefix it descends to in constant
