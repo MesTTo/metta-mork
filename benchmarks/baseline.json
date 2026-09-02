@@ -1,5 +1,6 @@
 {
   "translator_rule_home_repin_comment": "RE-PINNED 2026-09-03 after the engine translator registry and release predicates changed the image loaded beside MORK. Every inference count remains byte-identical to clean 12771f41, so no MORK operation performs more logical work. Nine retired-instruction rows leave their two-sided one-percent bands because the loaded Prolog image changed; only those nine minima are updated. Wall-derived CPU is advisory under the measured load. [measured: min-of-three MORK counters on clean 12771f41 and the changed tree; command=sh extensions/mork/bench.sh; fixture=libmork_ffi.so and morklib.so present with warm engine QLF files; commit=d1318d20b5d89d33079c49d0e94aa29e12685664]",
+  "translator_rule_provenance_floor_repin_comment": "RE-PINNED 2026-09-03, 28313 to 28808, after the provenance-only replacement of WORKTREE in engine source comments made qlf_boot.pl regenerate the umbrella QLF files. The functional commit measured the control window at [28358, 28358, 28281]; the provenance commit measured [28808, 28808, 28808] in the full gate and [28808, 28886, 28808] in a focused rerun. Every MORK workload inference count stayed exact, and the floor is subtracted from every workload instruction row, so this is an isolated compiled-image floor rather than added backend work. Wall time is advisory. [measured: minimum 28808 retired instructions; command=GATE_ONLY=1 sh check.sh and sh extensions/mork/bench.sh; fixture=warm QLF files regenerated from the provenance commit; commit=f16ea32b32a54843a277ac7369642005b638e06c]",
   "benchmarks": {
     "mork-batch-add-2000": {
       "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
@@ -276,7 +277,7 @@
       "cpu_seconds_per_operation": 8.2e-07,
       "inferences": 5,
       "instruction_noise_percent": 1.0,
-      "instructions": 28313,
+      "instructions": 28808,
       "operations": 1,
       "unit": "windows"
     }
