@@ -1,4 +1,5 @@
 {
+  "translator_rule_home_repin_comment": "RE-PINNED 2026-09-03 after the engine translator registry and release predicates changed the image loaded beside MORK. Every inference count remains byte-identical to clean 12771f41, so no MORK operation performs more logical work. Nine retired-instruction rows leave their two-sided one-percent bands because the loaded Prolog image changed; only those nine minima are updated. Wall-derived CPU is advisory under the measured load. [measured: min-of-three MORK counters on clean 12771f41 and the changed tree; command=sh extensions/mork/bench.sh; fixture=libmork_ffi.so and morklib.so present with warm engine QLF files; commit=WORKTREE]",
   "benchmarks": {
     "mork-batch-add-2000": {
       "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
@@ -14,7 +15,7 @@
       "cpu_seconds_per_operation": 1.2309000000000001e-06,
       "inferences": 17529,
       "instruction_noise_percent": 1.0,
-      "instructions": 14032188,
+      "instructions": 12973934,
       "operations": 500,
       "unit": "operations"
     },
@@ -68,7 +69,7 @@
       "cpu_seconds_per_operation": 8.68581e-06,
       "inferences": 13507,
       "instruction_noise_percent": 1.0,
-      "instructions": 14169858,
+      "instructions": 14644703,
       "operations": 100,
       "unit": "queries"
     },
@@ -122,7 +123,7 @@
       "cpu_seconds_per_operation": 1.29038e-06,
       "inferences": 5128,
       "instruction_noise_percent": 1.0,
-      "instructions": 13996411,
+      "instructions": 14454537,
       "operations": 500,
       "unit": "operations"
     },
@@ -167,7 +168,7 @@
       "cpu_seconds_per_operation": 5.334e-07,
       "inferences": 1707,
       "instruction_noise_percent": 1.0,
-      "instructions": 1194638,
+      "instructions": 1169103,
       "operations": 100,
       "unit": "queries"
     },
@@ -176,7 +177,7 @@
       "cpu_seconds_per_operation": 5.177e-07,
       "inferences": 1707,
       "instruction_noise_percent": 1.0,
-      "instructions": 1194628,
+      "instructions": 1169093,
       "operations": 100,
       "unit": "queries"
     },
@@ -185,7 +186,7 @@
       "cpu_seconds_per_operation": 5.761e-07,
       "inferences": 1707,
       "instruction_noise_percent": 1.0,
-      "instructions": 1196537,
+      "instructions": 1171003,
       "operations": 100,
       "unit": "queries"
     },
@@ -194,7 +195,7 @@
       "cpu_seconds_per_operation": 5.227e-07,
       "inferences": 1707,
       "instruction_noise_percent": 1.0,
-      "instructions": 1205438,
+      "instructions": 1179903,
       "operations": 100,
       "unit": "queries"
     },
@@ -203,7 +204,7 @@
       "cpu_seconds_per_operation": 5.224e-07,
       "inferences": 1707,
       "instruction_noise_percent": 1.0,
-      "instructions": 1205428,
+      "instructions": 1179893,
       "operations": 100,
       "unit": "queries"
     },
@@ -212,7 +213,7 @@
       "cpu_seconds_per_operation": 5.611e-07,
       "inferences": 1707,
       "instruction_noise_percent": 1.0,
-      "instructions": 1207338,
+      "instructions": 1181803,
       "operations": 100,
       "unit": "queries"
     },
