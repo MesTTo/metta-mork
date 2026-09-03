@@ -1,305 +1,306 @@
 {
-  "translator_rule_home_repin_comment": "RE-PINNED 2026-09-03 after the engine translator registry and release predicates changed the image loaded beside MORK. Every inference count remains byte-identical to clean 12771f41, so no MORK operation performs more logical work. Nine retired-instruction rows leave their two-sided one-percent bands because the loaded Prolog image changed; only those nine minima are updated. Wall-derived CPU is advisory under the measured load. [measured: min-of-three MORK counters on clean 12771f41 and the changed tree; command=sh extensions/mork/bench.sh; fixture=libmork_ffi.so and morklib.so present with warm engine QLF files; commit=d1318d20b5d89d33079c49d0e94aa29e12685664]",
-  "translator_rule_provenance_floor_repin_comment": "RE-PINNED 2026-09-03, 28313 to 28808, after the provenance-only replacement of WORKTREE in engine source comments made qlf_boot.pl regenerate the umbrella QLF files. The functional commit measured the control window at [28358, 28358, 28281]; the provenance commit measured [28808, 28808, 28808] in the full gate and [28808, 28886, 28808] in a focused rerun. Every MORK workload inference count stayed exact, and the floor is subtracted from every workload instruction row, so this is an isolated compiled-image floor rather than added backend work. Wall time is advisory. [measured: minimum 28808 retired instructions; command=GATE_ONLY=1 sh check.sh and sh extensions/mork/bench.sh; fixture=warm QLF files regenerated from the provenance commit; commit=f16ea32b32a54843a277ac7369642005b638e06c]",
-  "benchmarks": {
-    "mork-batch-add-2000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 1.2710205e-06,
-      "inferences": 70029,
-      "instruction_noise_percent": 1.0,
-      "instructions": 52561167,
-      "operations": 2000,
-      "unit": "operations"
-    },
-    "mork-batch-add-500": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 1.2309000000000001e-06,
-      "inferences": 17529,
-      "instruction_noise_percent": 1.0,
-      "instructions": 12973934,
-      "operations": 500,
-      "unit": "operations"
-    },
-    "mork-batch-add-8000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 1.179294e-06,
-      "inferences": 280029,
-      "instruction_noise_percent": 1.0,
-      "instructions": 212420432,
-      "operations": 8000,
-      "unit": "operations"
-    },
-    "mork-flush-2000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 8.794e-08,
-      "inferences": 19,
-      "instruction_noise_percent": 1.0,
-      "instructions": 3133441,
-      "operations": 2000,
-      "unit": "operations"
-    },
-    "mork-flush-500": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 1.0906e-07,
-      "inferences": 19,
-      "instruction_noise_percent": 1.0,
-      "instructions": 793693,
-      "operations": 500,
-      "unit": "operations"
-    },
-    "mork-flush-8000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 8.3487625e-08,
-      "inferences": 19,
-      "instruction_noise_percent": 1.0,
-      "instructions": 12720987,
-      "operations": 8000,
-      "unit": "operations"
-    },
-    "mork-mork-match-first-2000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 7.3599e-06,
-      "inferences": 13507,
-      "instruction_noise_percent": 1.0,
-      "instructions": 14354507,
-      "operations": 100,
-      "unit": "queries"
-    },
-    "mork-mork-match-first-500": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 8.68581e-06,
-      "inferences": 13507,
-      "instruction_noise_percent": 1.0,
-      "instructions": 14644703,
-      "operations": 100,
-      "unit": "queries"
-    },
-    "mork-mork-match-first-8000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 7.526e-06,
-      "inferences": 13507,
-      "instruction_noise_percent": 1.0,
-      "instructions": 14350500,
-      "operations": 100,
-      "unit": "queries"
-    },
-    "mork-mork-match-last-2000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 7.442472e-05,
-      "inferences": 13507,
-      "instruction_noise_percent": 1.0,
-      "instructions": 185293284,
-      "operations": 100,
-      "unit": "queries"
-    },
-    "mork-mork-match-last-500": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 2.9337700000000002e-05,
-      "inferences": 13507,
-      "instruction_noise_percent": 1.0,
-      "instructions": 65013768,
-      "operations": 100,
-      "unit": "queries"
-    },
-    "mork-mork-match-last-8000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 0.00033799768000000003,
-      "inferences": 13507,
-      "instruction_noise_percent": 1.0,
-      "instructions": 847229523,
-      "operations": 100,
-      "unit": "queries"
-    },
-    "mork-mork-match-open-2000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 1.3177505000000001e-06,
-      "inferences": 20128,
-      "instruction_noise_percent": 1.0,
-      "instructions": 56489238,
-      "operations": 2000,
-      "unit": "operations"
-    },
-    "mork-mork-match-open-500": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 1.29038e-06,
-      "inferences": 5128,
-      "instruction_noise_percent": 1.0,
-      "instructions": 14454537,
-      "operations": 500,
-      "unit": "operations"
-    },
-    "mork-mork-match-open-8000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 1.30164025e-06,
-      "inferences": 80128,
-      "instruction_noise_percent": 1.0,
-      "instructions": 227532259,
-      "operations": 8000,
-      "unit": "operations"
-    },
-    "mork-native-add-2000": {
-      "comment": "RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run. RE-PINNED 2026-09-01 at the compiled-language batch boundary: a fixed ~-145 instructions per native add (-1.25% on add-500 and add-2000, -336 absolute on window-floor), inference row exact throughout, deterministic (three identical minima across independent runs under load and quiet alike). Per-file attribution inside the batch was NOT isolated: the movement rides the measured swipl process's own load, where the batch's changed content is the shim (consulted through the extensions glob) and the seven engine files, either or both, and an instructions-only inference-exact constant of this size is the code-shape class the sibling baselines document [assumed: unisolated; measured 2026-09-01; command=sh extensions/mork/bench.sh; commit=51b792423cec5787614d1488c0793b8a50eaa6fc]. RE-PINNED 2026-09-01 for the 'subtract-atom'/3 head: +2.2% on window-floor and +3.8% on the native adds, INFERENCE-EXACT throughout (7533 on add-500 in every sample), which places the movement in the measured swipl process's own load rather than in work the adds do. The head adds a translator special-form clause and an embedded-operation row, both on paths a write crosses, and this seat's driver loads the same engine and shim; the same head moved the engine baseline's boot row by +158 and the C seat's by +478 the same day. It restores almost exactly the -1.25% those rows shed on 2026-09-01's earlier pass, which was the same class read the other way [measured 2026-09-01; command=sh extensions/mork/bench.sh; commit=c6a40460b1db341198a6150e3600f502831a6e83].",
-      "cpu_seconds_per_operation": 7.778955e-07,
-      "inferences": 30033,
-      "instruction_noise_percent": 1.0,
-      "instructions": 22980805,
-      "operations": 2000,
-      "unit": "operations"
-    },
-    "mork-native-add-500": {
-      "comment": "RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run. RE-PINNED 2026-09-01 at the compiled-language batch boundary: a fixed ~-145 instructions per native add (-1.25% on add-500 and add-2000, -336 absolute on window-floor), inference row exact throughout, deterministic (three identical minima across independent runs under load and quiet alike). Per-file attribution inside the batch was NOT isolated: the movement rides the measured swipl process's own load, where the batch's changed content is the shim (consulted through the extensions glob) and the seven engine files, either or both, and an instructions-only inference-exact constant of this size is the code-shape class the sibling baselines document [assumed: unisolated; measured 2026-09-01; command=sh extensions/mork/bench.sh; commit=51b792423cec5787614d1488c0793b8a50eaa6fc]. RE-PINNED 2026-09-01 for the 'subtract-atom'/3 head: +2.2% on window-floor and +3.8% on the native adds, INFERENCE-EXACT throughout (7533 on add-500 in every sample), which places the movement in the measured swipl process's own load rather than in work the adds do. The head adds a translator special-form clause and an embedded-operation row, both on paths a write crosses, and this seat's driver loads the same engine and shim; the same head moved the engine baseline's boot row by +158 and the C seat's by +478 the same day. It restores almost exactly the -1.25% those rows shed on 2026-09-01's earlier pass, which was the same class read the other way [measured 2026-09-01; command=sh extensions/mork/bench.sh; commit=c6a40460b1db341198a6150e3600f502831a6e83].",
-      "cpu_seconds_per_operation": 7.6578e-07,
-      "inferences": 7533,
-      "instruction_noise_percent": 1.0,
-      "instructions": 5759122,
-      "operations": 500,
-      "unit": "operations"
-    },
-    "mork-native-add-8000": {
-      "comment": "RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run. RE-PINNED 2026-09-01 in the same batch-boundary sweep as the flagged add-500/add-2000 pair, instructions 98643518 to 97369182 (-1.29%), the same fixed per-add constant at the larger drive; this row sat inside its band so the sweep moved it without flagging, and the pin records it rather than leaving the movement unexplained [measured 2026-09-01; command=sh extensions/mork/bench.sh; commit=51b792423cec5787614d1488c0793b8a50eaa6fc]. RE-PINNED 2026-09-01 for the 'subtract-atom'/3 head: +2.2% on window-floor and +3.8% on the native adds, INFERENCE-EXACT throughout (7533 on add-500 in every sample), which places the movement in the measured swipl process's own load rather than in work the adds do. The head adds a translator special-form clause and an embedded-operation row, both on paths a write crosses, and this seat's driver loads the same engine and shim; the same head moved the engine baseline's boot row by +158 and the C seat's by +478 the same day. It restores almost exactly the -1.25% those rows shed on 2026-09-01's earlier pass, which was the same class read the other way [measured 2026-09-01; command=sh extensions/mork/bench.sh; commit=c6a40460b1db341198a6150e3600f502831a6e83].",
-      "cpu_seconds_per_operation": 7.06280125e-07,
-      "inferences": 120033,
-      "instruction_noise_percent": 4.0,
-      "instructions": 96784274,
-      "operations": 8000,
-      "unit": "operations"
-    },
-    "mork-native-match-first-2000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 5.334e-07,
-      "inferences": 1707,
-      "instruction_noise_percent": 1.0,
-      "instructions": 1169103,
-      "operations": 100,
-      "unit": "queries"
-    },
-    "mork-native-match-first-500": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 5.177e-07,
-      "inferences": 1707,
-      "instruction_noise_percent": 1.0,
-      "instructions": 1169093,
-      "operations": 100,
-      "unit": "queries"
-    },
-    "mork-native-match-first-8000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 5.761e-07,
-      "inferences": 1707,
-      "instruction_noise_percent": 1.0,
-      "instructions": 1171003,
-      "operations": 100,
-      "unit": "queries"
-    },
-    "mork-native-match-last-2000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 5.227e-07,
-      "inferences": 1707,
-      "instruction_noise_percent": 1.0,
-      "instructions": 1179903,
-      "operations": 100,
-      "unit": "queries"
-    },
-    "mork-native-match-last-500": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 5.224e-07,
-      "inferences": 1707,
-      "instruction_noise_percent": 1.0,
-      "instructions": 1179893,
-      "operations": 100,
-      "unit": "queries"
-    },
-    "mork-native-match-last-8000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 5.611e-07,
-      "inferences": 1707,
-      "instruction_noise_percent": 1.0,
-      "instructions": 1181803,
-      "operations": 100,
-      "unit": "queries"
-    },
-    "mork-native-match-open-2000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 7.362000000000001e-08,
-      "inferences": 4018,
-      "instruction_noise_percent": 1.0,
-      "instructions": 4016837,
-      "operations": 2000,
-      "unit": "operations"
-    },
-    "mork-native-match-open-500": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 7.862e-08,
-      "inferences": 1018,
-      "instruction_noise_percent": 1.0,
-      "instructions": 1010828,
-      "operations": 500,
-      "unit": "operations"
-    },
-    "mork-native-match-open-8000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 7.335624999999999e-08,
-      "inferences": 16018,
-      "instruction_noise_percent": 1.0,
-      "instructions": 16040534,
-      "operations": 8000,
-      "unit": "operations"
-    },
-    "mork-per-atom-add-2000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 4.043166e-06,
-      "inferences": 144014,
-      "instruction_noise_percent": 1.0,
-      "instructions": 157006644,
-      "operations": 2000,
-      "unit": "operations"
-    },
-    "mork-per-atom-add-500": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 4.27398e-06,
-      "inferences": 36014,
-      "instruction_noise_percent": 1.0,
-      "instructions": 38666441,
-      "operations": 500,
-      "unit": "operations"
-    },
-    "mork-per-atom-add-8000": {
-      "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
-      "cpu_seconds_per_operation": 4.01574725e-06,
-      "inferences": 576014,
-      "instruction_noise_percent": 1.0,
-      "instructions": 628477866,
-      "operations": 8000,
-      "unit": "operations"
-    },
-    "mork-window-floor": {
-      "comment": "RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run. RE-PINNED 2026-08-31 to 28,536: the drop path now clears a space's store in its own engine query ahead of the release (the door that restored atom reclamation), which this floor row crosses. Measured stable across five consecutive runs, min 28,536 with an occasional 28,614 (0.27%), against a 29,308 reading taken during the full gate while probe processes loaded the box; the quiet-box value is the pin. RE-PINNED 2026-09-01 at the compiled-language batch boundary: a fixed ~-145 instructions per native add (-1.25% on add-500 and add-2000, -336 absolute on window-floor), inference row exact throughout, deterministic (three identical minima across independent runs under load and quiet alike). Per-file attribution inside the batch was NOT isolated: the movement rides the measured swipl process's own load, where the batch's changed content is the shim (consulted through the extensions glob) and the seven engine files, either or both, and an instructions-only inference-exact constant of this size is the code-shape class the sibling baselines document [assumed: unisolated; measured 2026-09-01; command=sh extensions/mork/bench.sh; commit=51b792423cec5787614d1488c0793b8a50eaa6fc]. RE-PINNED 2026-09-01 for the 'subtract-atom'/3 head: +2.2% on window-floor and +3.8% on the native adds, INFERENCE-EXACT throughout (7533 on add-500 in every sample), which places the movement in the measured swipl process's own load rather than in work the adds do. The head adds a translator special-form clause and an embedded-operation row, both on paths a write crosses, and this seat's driver loads the same engine and shim; the same head moved the engine baseline's boot row by +158 and the C seat's by +478 the same day. It restores almost exactly the -1.25% those rows shed on 2026-09-01's earlier pass, which was the same class read the other way [measured 2026-09-01; command=sh extensions/mork/bench.sh; commit=c6a40460b1db341198a6150e3600f502831a6e83].",
-      "cpu_seconds_per_operation": 8.2e-07,
-      "inferences": 5,
-      "instruction_noise_percent": 1.0,
-      "instructions": 28808,
-      "operations": 1,
-      "unit": "windows"
-    }
+ "benchmarks": {
+  "mork-batch-add-2000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 1.1838855e-06,
+   "inferences": 70029,
+   "instruction_noise_percent": 1.0,
+   "instructions": 52433376,
+   "operations": 2000,
+   "unit": "operations"
   },
-  "counter_configuration": {
-    "c_reader": true,
-    "c_writer": true,
-    "mork_ffi": true,
-    "morklib": true
+  "mork-batch-add-500": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 1.34428e-06,
+   "inferences": 17529,
+   "instruction_noise_percent": 1.0,
+   "instructions": 13998875,
+   "operations": 500,
+   "unit": "operations"
   },
-  "counter_policy": "stats().inferences minimum of three and fixed two-point growth slopes decide; wall time advises",
-  "instruction_policy": "perf instructions:u minimum of three, one percent noise allowance unless a row declares its own beside the measurement that justified it",
-  "p43_loaded_image_repin_comment": "RE-PINNED 2026-09-02 after static contract discharge changed the engine image loaded beside MORK. Every inference count is byte-identical before and after, so no MORK operation performs more logical work. Equal-length q42/p43 controls isolate the deterministic instruction movements: batch-add-500 12998044 to 14024157 (+7.895%), native-add-500 6001006 to 5758648 (-4.039%), native-add-2000 23944355 to 22981049 (-4.023%), and mork-match-first-500 14665892 to 14173613 (-3.357%). The six bound native-match rows move by the same fixed 14310 to 14313 instructions, +1.200% to +1.212%, at 500, 2000 and 8000 atoms. The 500-only batch and MORK-match shifts are fixed process costs that amortize below the band at larger sizes. A second current-checkout comparison also places native-add-8000 below its old 4% band at 96654437, so its pin moves 100754247 to the update run's 96784274; the checkout-local control-window floor moves 28828 to 28313. Only the twelve rows that left their bands are updated, and CPU readings under shared load remain at their earlier values. [measured: min-of-three controlled instructions and inference counts before and after P43; command=CHECK_PY=$CHECK_PY sh extensions/mork/bench.sh --update; fixture=equal-length q42 and p43 worktrees with libmork_ffi.so and morklib.so present; commit=6872eee94500bc0246eabaa40d7175c498cc32ab]",
-  "measurement": {
-    "band": "one percent unless a row declares its own. mork-native-add-8000 declares four: its minimum moved 1.605% across four runs and its samples spread 1.992% within one, where every other row moved under 0.240%. Adding 8000 clauses to a dynamic predicate grows SWI's clause store and its just-in-time index across resize thresholds, and where those land depends on allocation rather than on the workload.",
-    "loadavg_while_pinning": "7.5 to 12.3 on a 32 core box",
-    "repin_note": "2026-08-31 re-pin: the landed engine set of that night, the transaction participant walk and outcome record (space_hooks.pl, +105 lines), the space-'used' clause test (lifecycle.pl) and lib_tabling's targeted invalidation replacing abolish_all_tables/0, together with the petta matcher adoption, which is what the native match rows here gain. Per-file isolation was done on the engine-bench lane (two inert clauses = 0, the new predicate called 0 times at boot, the effects.pl message reverted = unchanged) and is not repeated per seat; min-of-3 per row.",
-    "taken": "2026-08-28",
-    "wants_a_quiet_box": [
-      "mork-native-add-8000, whose band is set from movement measured under load",
-      "mork-native-match-last-8000, one sample of which came back 3.4x the other two in one run; the minimum of three absorbed it and the pin did not move"
-    ]
+  "mork-batch-add-8000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 1.269467875e-06,
+   "inferences": 280029,
+   "instruction_noise_percent": 1.0,
+   "instructions": 211905277,
+   "operations": 8000,
+   "unit": "operations"
   },
-  "schema": 1
+  "mork-flush-2000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 8.941e-08,
+   "inferences": 19,
+   "instruction_noise_percent": 1.0,
+   "instructions": 3133481,
+   "operations": 2000,
+   "unit": "operations"
+  },
+  "mork-flush-500": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 1.0574e-07,
+   "inferences": 19,
+   "instruction_noise_percent": 1.0,
+   "instructions": 793634,
+   "operations": 500,
+   "unit": "operations"
+  },
+  "mork-flush-8000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 8.569375e-08,
+   "inferences": 19,
+   "instruction_noise_percent": 1.0,
+   "instructions": 12722456,
+   "operations": 8000,
+   "unit": "operations"
+  },
+  "mork-mork-match-first-2000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 7.3682e-06,
+   "inferences": 13507,
+   "instruction_noise_percent": 1.0,
+   "instructions": 14355393,
+   "operations": 100,
+   "unit": "queries"
+  },
+  "mork-mork-match-first-500": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 7.2528e-06,
+   "inferences": 13507,
+   "instruction_noise_percent": 1.0,
+   "instructions": 14184928,
+   "operations": 100,
+   "unit": "queries"
+  },
+  "mork-mork-match-first-8000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 7.6377e-06,
+   "inferences": 13507,
+   "instruction_noise_percent": 1.0,
+   "instructions": 14350951,
+   "operations": 100,
+   "unit": "queries"
+  },
+  "mork-mork-match-last-2000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 7.924002e-05,
+   "inferences": 13507,
+   "instruction_noise_percent": 1.0,
+   "instructions": 185294368,
+   "operations": 100,
+   "unit": "queries"
+  },
+  "mork-mork-match-last-500": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 2.922031e-05,
+   "inferences": 13507,
+   "instruction_noise_percent": 1.0,
+   "instructions": 64532986,
+   "operations": 100,
+   "unit": "queries"
+  },
+  "mork-mork-match-last-8000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 0.00033084957,
+   "inferences": 13507,
+   "instruction_noise_percent": 1.0,
+   "instructions": 847230279,
+   "operations": 100,
+   "unit": "queries"
+  },
+  "mork-mork-match-open-2000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 1.3264655e-06,
+   "inferences": 20128,
+   "instruction_noise_percent": 1.0,
+   "instructions": 56489538,
+   "operations": 2000,
+   "unit": "operations"
+  },
+  "mork-mork-match-open-500": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 1.313082e-06,
+   "inferences": 5128,
+   "instruction_noise_percent": 1.0,
+   "instructions": 13996503,
+   "operations": 500,
+   "unit": "operations"
+  },
+  "mork-mork-match-open-8000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 1.2996541250000002e-06,
+   "inferences": 80128,
+   "instruction_noise_percent": 1.0,
+   "instructions": 227532241,
+   "operations": 8000,
+   "unit": "operations"
+  },
+  "mork-native-add-2000": {
+   "comment": "RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run. RE-PINNED 2026-09-01 at the compiled-language batch boundary: a fixed ~-145 instructions per native add (-1.25% on add-500 and add-2000, -336 absolute on window-floor), inference row exact throughout, deterministic (three identical minima across independent runs under load and quiet alike). Per-file attribution inside the batch was NOT isolated: the movement rides the measured swipl process's own load, where the batch's changed content is the shim (consulted through the extensions glob) and the seven engine files, either or both, and an instructions-only inference-exact constant of this size is the code-shape class the sibling baselines document [assumed: unisolated; measured 2026-09-01; command=sh extensions/mork/bench.sh; commit=51b792423cec5787614d1488c0793b8a50eaa6fc]. RE-PINNED 2026-09-01 for the 'subtract-atom'/3 head: +2.2% on window-floor and +3.8% on the native adds, INFERENCE-EXACT throughout (7533 on add-500 in every sample), which places the movement in the measured swipl process's own load rather than in work the adds do. The head adds a translator special-form clause and an embedded-operation row, both on paths a write crosses, and this seat's driver loads the same engine and shim; the same head moved the engine baseline's boot row by +158 and the C seat's by +478 the same day. It restores almost exactly the -1.25% those rows shed on 2026-09-01's earlier pass, which was the same class read the other way [measured 2026-09-01; command=sh extensions/mork/bench.sh; commit=c6a40460b1db341198a6150e3600f502831a6e83].",
+   "cpu_seconds_per_operation": 7.015155e-07,
+   "inferences": 30033,
+   "instruction_noise_percent": 1.0,
+   "instructions": 22981529,
+   "operations": 2000,
+   "unit": "operations"
+  },
+  "mork-native-add-500": {
+   "comment": "RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run. RE-PINNED 2026-09-01 at the compiled-language batch boundary: a fixed ~-145 instructions per native add (-1.25% on add-500 and add-2000, -336 absolute on window-floor), inference row exact throughout, deterministic (three identical minima across independent runs under load and quiet alike). Per-file attribution inside the batch was NOT isolated: the movement rides the measured swipl process's own load, where the batch's changed content is the shim (consulted through the extensions glob) and the seven engine files, either or both, and an instructions-only inference-exact constant of this size is the code-shape class the sibling baselines document [assumed: unisolated; measured 2026-09-01; command=sh extensions/mork/bench.sh; commit=51b792423cec5787614d1488c0793b8a50eaa6fc]. RE-PINNED 2026-09-01 for the 'subtract-atom'/3 head: +2.2% on window-floor and +3.8% on the native adds, INFERENCE-EXACT throughout (7533 on add-500 in every sample), which places the movement in the measured swipl process's own load rather than in work the adds do. The head adds a translator special-form clause and an embedded-operation row, both on paths a write crosses, and this seat's driver loads the same engine and shim; the same head moved the engine baseline's boot row by +158 and the C seat's by +478 the same day. It restores almost exactly the -1.25% those rows shed on 2026-09-01's earlier pass, which was the same class read the other way [measured 2026-09-01; command=sh extensions/mork/bench.sh; commit=c6a40460b1db341198a6150e3600f502831a6e83].",
+   "cpu_seconds_per_operation": 7.0364e-07,
+   "inferences": 7533,
+   "instruction_noise_percent": 1.0,
+   "instructions": 5759857,
+   "operations": 500,
+   "unit": "operations"
+  },
+  "mork-native-add-8000": {
+   "comment": "RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run. RE-PINNED 2026-09-01 in the same batch-boundary sweep as the flagged add-500/add-2000 pair, instructions 98643518 to 97369182 (-1.29%), the same fixed per-add constant at the larger drive; this row sat inside its band so the sweep moved it without flagging, and the pin records it rather than leaving the movement unexplained [measured 2026-09-01; command=sh extensions/mork/bench.sh; commit=51b792423cec5787614d1488c0793b8a50eaa6fc]. RE-PINNED 2026-09-01 for the 'subtract-atom'/3 head: +2.2% on window-floor and +3.8% on the native adds, INFERENCE-EXACT throughout (7533 on add-500 in every sample), which places the movement in the measured swipl process's own load rather than in work the adds do. The head adds a translator special-form clause and an embedded-operation row, both on paths a write crosses, and this seat's driver loads the same engine and shim; the same head moved the engine baseline's boot row by +158 and the C seat's by +478 the same day. It restores almost exactly the -1.25% those rows shed on 2026-09-01's earlier pass, which was the same class read the other way [measured 2026-09-01; command=sh extensions/mork/bench.sh; commit=c6a40460b1db341198a6150e3600f502831a6e83].",
+   "cpu_seconds_per_operation": 7.61643875e-07,
+   "inferences": 120033,
+   "instruction_noise_percent": 4.0,
+   "instructions": 96764952,
+   "operations": 8000,
+   "unit": "operations"
+  },
+  "mork-native-match-first-2000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 5.38e-07,
+   "inferences": 1707,
+   "instruction_noise_percent": 1.0,
+   "instructions": 1180271,
+   "operations": 100,
+   "unit": "queries"
+  },
+  "mork-native-match-first-500": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 5.307e-07,
+   "inferences": 1707,
+   "instruction_noise_percent": 1.0,
+   "instructions": 1180261,
+   "operations": 100,
+   "unit": "queries"
+  },
+  "mork-native-match-first-8000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 5.493e-07,
+   "inferences": 1707,
+   "instruction_noise_percent": 1.0,
+   "instructions": 1182171,
+   "operations": 100,
+   "unit": "queries"
+  },
+  "mork-native-match-last-2000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 5.174e-07,
+   "inferences": 1707,
+   "instruction_noise_percent": 1.0,
+   "instructions": 1191071,
+   "operations": 100,
+   "unit": "queries"
+  },
+  "mork-native-match-last-500": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 5.5251e-07,
+   "inferences": 1707,
+   "instruction_noise_percent": 1.0,
+   "instructions": 1191061,
+   "operations": 100,
+   "unit": "queries"
+  },
+  "mork-native-match-last-8000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 6.015e-07,
+   "inferences": 1707,
+   "instruction_noise_percent": 1.0,
+   "instructions": 1192971,
+   "operations": 100,
+   "unit": "queries"
+  },
+  "mork-native-match-open-2000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 7.3615e-08,
+   "inferences": 4018,
+   "instruction_noise_percent": 1.0,
+   "instructions": 4016905,
+   "operations": 2000,
+   "unit": "operations"
+  },
+  "mork-native-match-open-500": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 7.739999999999999e-08,
+   "inferences": 1018,
+   "instruction_noise_percent": 1.0,
+   "instructions": 1010896,
+   "operations": 500,
+   "unit": "operations"
+  },
+  "mork-native-match-open-8000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 7.7708875e-08,
+   "inferences": 16018,
+   "instruction_noise_percent": 1.0,
+   "instructions": 16040602,
+   "operations": 8000,
+   "unit": "operations"
+  },
+  "mork-per-atom-add-2000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 3.9818559999999996e-06,
+   "inferences": 144014,
+   "instruction_noise_percent": 1.0,
+   "instructions": 157111274,
+   "operations": 2000,
+   "unit": "operations"
+  },
+  "mork-per-atom-add-500": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 4.07974e-06,
+   "inferences": 36014,
+   "instruction_noise_percent": 1.0,
+   "instructions": 38905502,
+   "operations": 500,
+   "unit": "operations"
+  },
+  "mork-per-atom-add-8000": {
+   "comment": " RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run.",
+   "cpu_seconds_per_operation": 4.082659750000001e-06,
+   "inferences": 576014,
+   "instruction_noise_percent": 1.0,
+   "instructions": 628881116,
+   "operations": 8000,
+   "unit": "operations"
+  },
+  "mork-window-floor": {
+   "comment": "RE-PINNED 2026-08-30 (petta-alignment campaign): the shared engine's guard eliminations cheapened the boot and per-call shares every row carries; the backend itself did not change. mork-window-floor is a ~25k-instruction window over the warm boot and moves with the .qlf regeneration state, so it was re-pinned back-to-back with its verify run. RE-PINNED 2026-08-31 to 28,536: the drop path now clears a space's store in its own engine query ahead of the release (the door that restored atom reclamation), which this floor row crosses. Measured stable across five consecutive runs, min 28,536 with an occasional 28,614 (0.27%), against a 29,308 reading taken during the full gate while probe processes loaded the box; the quiet-box value is the pin. RE-PINNED 2026-09-01 at the compiled-language batch boundary: a fixed ~-145 instructions per native add (-1.25% on add-500 and add-2000, -336 absolute on window-floor), inference row exact throughout, deterministic (three identical minima across independent runs under load and quiet alike). Per-file attribution inside the batch was NOT isolated: the movement rides the measured swipl process's own load, where the batch's changed content is the shim (consulted through the extensions glob) and the seven engine files, either or both, and an instructions-only inference-exact constant of this size is the code-shape class the sibling baselines document [assumed: unisolated; measured 2026-09-01; command=sh extensions/mork/bench.sh; commit=51b792423cec5787614d1488c0793b8a50eaa6fc]. RE-PINNED 2026-09-01 for the 'subtract-atom'/3 head: +2.2% on window-floor and +3.8% on the native adds, INFERENCE-EXACT throughout (7533 on add-500 in every sample), which places the movement in the measured swipl process's own load rather than in work the adds do. The head adds a translator special-form clause and an embedded-operation row, both on paths a write crosses, and this seat's driver loads the same engine and shim; the same head moved the engine baseline's boot row by +158 and the C seat's by +478 the same day. It restores almost exactly the -1.25% those rows shed on 2026-09-01's earlier pass, which was the same class read the other way [measured 2026-09-01; command=sh extensions/mork/bench.sh; commit=c6a40460b1db341198a6150e3600f502831a6e83].",
+   "cpu_seconds_per_operation": 6.4e-07,
+   "inferences": 5,
+   "instruction_noise_percent": 1.0,
+   "instructions": 28952,
+   "operations": 1,
+   "unit": "windows"
+  }
+ },
+ "counter_configuration": {
+  "c_reader": true,
+  "c_writer": true,
+  "mork_ffi": true,
+  "morklib": true
+ },
+ "counter_policy": "stats().inferences minimum of three and fixed two-point growth slopes decide; wall time advises",
+ "instruction_policy": "perf instructions:u minimum of three, one percent noise allowance unless a row declares its own beside the measurement that justified it",
+ "measurement": {
+  "band": "one percent unless a row declares its own. mork-native-add-8000 declares four: its minimum moved 1.605% across four runs and its samples spread 1.992% within one, where every other row moved under 0.240%. Adding 8000 clauses to a dynamic predicate grows SWI's clause store and its just-in-time index across resize thresholds, and where those land depends on allocation rather than on the workload.",
+  "loadavg_while_pinning": "7.5 to 12.3 on a 32 core box",
+  "repin_note": "2026-08-31 re-pin: the landed engine set of that night, the transaction participant walk and outcome record (space_hooks.pl, +105 lines), the space-'used' clause test (lifecycle.pl) and lib_tabling's targeted invalidation replacing abolish_all_tables/0, together with the petta matcher adoption, which is what the native match rows here gain. Per-file isolation was done on the engine-bench lane (two inert clauses = 0, the new predicate called 0 times at boot, the effects.pl message reverted = unchanged) and is not repeated per seat; min-of-3 per row.",
+  "taken": "2026-08-28",
+  "wants_a_quiet_box": [
+   "mork-native-add-8000, whose band is set from movement measured under load",
+   "mork-native-match-last-8000, one sample of which came back 3.4x the other two in one run; the minimum of three absorbed it and the pin did not move"
+  ]
+ },
+ "p43_loaded_image_repin_comment": "RE-PINNED 2026-09-02 after static contract discharge changed the engine image loaded beside MORK. Every inference count is byte-identical before and after, so no MORK operation performs more logical work. Equal-length q42/p43 controls isolate the deterministic instruction movements: batch-add-500 12998044 to 14024157 (+7.895%), native-add-500 6001006 to 5758648 (-4.039%), native-add-2000 23944355 to 22981049 (-4.023%), and mork-match-first-500 14665892 to 14173613 (-3.357%). The six bound native-match rows move by the same fixed 14310 to 14313 instructions, +1.200% to +1.212%, at 500, 2000 and 8000 atoms. The 500-only batch and MORK-match shifts are fixed process costs that amortize below the band at larger sizes. A second current-checkout comparison also places native-add-8000 below its old 4% band at 96654437, so its pin moves 100754247 to the update run's 96784274; the checkout-local control-window floor moves 28828 to 28313. Only the twelve rows that left their bands are updated, and CPU readings under shared load remain at their earlier values. [measured: min-of-three controlled instructions and inference counts before and after P43; command=CHECK_PY=$CHECK_PY sh extensions/mork/bench.sh --update; fixture=equal-length q42 and p43 worktrees with libmork_ffi.so and morklib.so present; commit=6872eee94500bc0246eabaa40d7175c498cc32ab]",
+ "release_0_7_0_layout_repin_comment": "RE-PINNED 2026-09-04 for the 0.7.0 release work. Instruction-only, and the evidence that it is LAYOUT rather than work is that the inference counts are byte-identical across three samples on every row that pins one: batch-add-500 17529, per-atom-add-500 36014, native-add-500 7533, mork-match-first-500 13507, native-match-first-500 1707. The engine image grew this session -- a seam declaration, the tracer's truncation flag and cell budget, the fast-cache scan's clauses -- and qlf_boot.pl regenerates the umbrella QLF files, so the same logical work is reached through differently placed code. That is the same mechanism this file already records for the provenance-only WORKTREE replacement that moved the MORK control-window floor 28313 to 28808. No row's inference count moved [measured 2026-09-04; command=sh extensions/mork/bench.sh --update; fixture=warm main-checkout engine artifacts; commit=WORKTREE]",
+ "schema": 1,
+ "translator_rule_home_repin_comment": "RE-PINNED 2026-09-03 after the engine translator registry and release predicates changed the image loaded beside MORK. Every inference count remains byte-identical to clean 12771f41, so no MORK operation performs more logical work. Nine retired-instruction rows leave their two-sided one-percent bands because the loaded Prolog image changed; only those nine minima are updated. Wall-derived CPU is advisory under the measured load. [measured: min-of-three MORK counters on clean 12771f41 and the changed tree; command=sh extensions/mork/bench.sh; fixture=libmork_ffi.so and morklib.so present with warm engine QLF files; commit=d1318d20b5d89d33079c49d0e94aa29e12685664]",
+ "translator_rule_provenance_floor_repin_comment": "RE-PINNED 2026-09-03, 28313 to 28808, after the provenance-only replacement of WORKTREE in engine source comments made qlf_boot.pl regenerate the umbrella QLF files. The functional commit measured the control window at [28358, 28358, 28281]; the provenance commit measured [28808, 28808, 28808] in the full gate and [28808, 28886, 28808] in a focused rerun. Every MORK workload inference count stayed exact, and the floor is subtracted from every workload instruction row, so this is an isolated compiled-image floor rather than added backend work. Wall time is advisory. [measured: minimum 28808 retired instructions; command=GATE_ONLY=1 sh check.sh and sh extensions/mork/bench.sh; fixture=warm QLF files regenerated from the provenance commit; commit=f16ea32b32a54843a277ac7369642005b638e06c]"
 }
