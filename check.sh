@@ -30,7 +30,7 @@
 # Nothing here builds anything: cargo is not fetched, and a tree without the
 # backend runs the seat-absent half and says which half it ran.
 check_mork_seat() {
-    sh "$HERE/extensions/mork/test.sh"
+    bounded sh "$HERE/extensions/mork/test.sh"
 }
 run GATE mork-seat check_mork_seat
 
@@ -45,7 +45,7 @@ run GATE mork-seat check_mork_seat
 # perf, setarch and the built backend are all requirements bench.sh names and
 # skips on rather than failing, the same split every component script draws.
 check_mork_bench() {
-    sh "$HERE/extensions/mork/bench.sh"
+    bounded sh "$HERE/extensions/mork/bench.sh"
 }
 run GATE mork-bench check_mork_bench
 
@@ -56,7 +56,7 @@ run GATE mork-bench check_mork_bench
 # is one house style and a component that argued with it would be the defect.
 check_mork_lint() {
     [ -f "$HERE/extensions/python/pyproject.toml" ] || return 0
-    "$PY" -m ruff check --config "$HERE/extensions/python/pyproject.toml" \
+    bounded "$PY" -m ruff check --config "$HERE/extensions/python/pyproject.toml" \
         "$HERE/extensions/mork/benchmarks/bench.py"
 }
 run GATE mork-lint check_mork_lint
