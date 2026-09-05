@@ -43,6 +43,10 @@ set -eu
 HERE=$(cd -- "$(dirname -- "$0")" && pwd)
 cd "$HERE"
 
+# One spelling of the bound, implemented in bounded.sh, which every runner in
+# this tree and a command typed by hand all reach.
+bounded() { sh "$HERE/../../../bounded.sh" "$@"; }
+
 missing=''
 for tool in cargo nm swipl-ld; do
     command -v "$tool" >/dev/null 2>&1 || missing="$missing $tool"
@@ -55,7 +59,8 @@ if ! command -v cc >/dev/null 2>&1 &&
    ! command -v clang >/dev/null 2>&1; then
     missing="$missing a-C-compiler(cc,gcc-or-clang)"
 fi
-if command -v cargo >/dev/null 2>&1 && ! cargo +nightly --version >/dev/null 2>&1; then
+if command -v cargo >/dev/null 2>&1 &&
+   ! bounded cargo +nightly --version >/dev/null 2>&1; then
     missing="$missing rust-nightly-toolchain(rustup toolchain install nightly)"
 fi
 if [ -n "$missing" ]; then
@@ -89,6 +94,6 @@ if ! nm -D ./target/release/libmork_ffi.so | grep -q ' rust_mork$'; then
     exit 1
 fi
 
-swipl-ld -shared -o morklib.so mork.c
+bounded swipl-ld -shared -o morklib.so mork.c
 
 echo "Successfully built mork_ffi"

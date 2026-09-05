@@ -53,7 +53,11 @@ fi
 
 # Redirected to a file rather than piped, because a pipeline reports the LAST
 # command's status and swipl failing would be masked by the reader succeeding.
-swipl -g "set_test_options([format(log)]), run_tests" -t halt \
+# One spelling of the bound, implemented in bounded.sh, which every runner in
+# this tree and a command typed by hand all reach.
+bounded() { sh "$HERE/../../bounded.sh" "$@"; }
+
+bounded swipl -g "set_test_options([format(log)]), run_tests" -t halt \
       "$HERE/tests/mork_seat.plt" -- extensions > "$log" 2>&1 || status=1
 cat "$log"
 
@@ -81,6 +85,6 @@ if [ "$built" = yes ] && ! grep -q "All $declared tests passed" "$log"; then
     status=1
 fi
 
-sh "$HERE/tests/test_missing_artefacts.sh" || status=1
+bounded sh "$HERE/tests/test_missing_artefacts.sh" || status=1
 
 exit $status
