@@ -81,8 +81,20 @@ fi
 # cargo invocation sees it, so the gate's scratch stays where its reaping and
 # retention logic expects. Where XDG_RUNTIME_DIR is unset the inherited TMPDIR
 # stands, and sccache's own refusal names the cause.
+#
+# The two assignments stand in front of `bounded`, and the bound is still the
+# command word. They reach cargo because a variable assigned in front of a
+# shell FUNCTION is exported for the whole of that function's execution, which
+# includes the `sh bounded.sh` it starts [measured 2026-09-06: dash, /bin/sh
+# and bash each answer `set` to
+# `f() { sh -c 'echo "${P:-unset}"'; }; P=set f; echo "${P:-unset}"` and
+# `unset` to the echo after it]. This was the one unbounded spawn in the tree when
+# tests/checks/check_process_bounds.py learned to read an assignment prefix
+# that does not end at the first space: `RUSTFLAGS="-C target-cpu=native"` has
+# one inside its quotes, so the old prefix pattern stopped there and the line
+# matched nothing at all.
 RUSTFLAGS="-C target-cpu=native" TMPDIR="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}" \
-    cargo +nightly build -p mork_ffi --release
+    bounded cargo +nightly build -p mork_ffi --release
 
 # The engine reaches this library through exactly one entry point, so its
 # absence means the crate built into something the backend cannot call. Checked
