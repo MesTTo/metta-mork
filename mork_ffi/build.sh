@@ -68,7 +68,7 @@ fi
 # name must stay under SUN_LEN (108 bytes), which it does from a TMPDIR of 80
 # characters and does not from 90 [measured 2026-09-05: rustc -vV through
 # sccache at TMPDIR lengths 60/70/80 answered, 90/100 refused with "path must
-# be shorter than SUN_LEN"; commit=WORKTREE]. The gate exports TMPDIR beneath
+# be shorter than SUN_LEN"; commit=14fd2421963cb7178219512eace7663cd0fe6a67]. The gate exports TMPDIR beneath
 # the repository's own scratch, which inside an agent worktree is 100
 # characters before sccache adds anything, so the seat could not build there
 # at all. A socket belongs in the per-user runtime directory, which is short
