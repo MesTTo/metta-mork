@@ -63,7 +63,21 @@ if [ -n "$missing" ]; then
     exit 1
 fi
 
-RUSTFLAGS="-C target-cpu=native" cargo +nightly build -p mork_ffi --release
+# cargo's rustc-wrapper is sccache on a box that has ~/.cargo/config.toml say so,
+# and sccache derives its server socket path from TMPDIR: on 0.15.0 the derived
+# name must stay under SUN_LEN (108 bytes), which it does from a TMPDIR of 80
+# characters and does not from 90 [measured 2026-09-05: rustc -vV through
+# sccache at TMPDIR lengths 60/70/80 answered, 90/100 refused with "path must
+# be shorter than SUN_LEN"; commit=WORKTREE]. The gate exports TMPDIR beneath
+# the repository's own scratch, which inside an agent worktree is 100
+# characters before sccache adds anything, so the seat could not build there
+# at all. A socket belongs in the per-user runtime directory, which is short
+# by design (/run/user/UID) and is what XDG names for exactly this; only the
+# cargo invocation sees it, so the gate's scratch stays where its reaping and
+# retention logic expects. Where XDG_RUNTIME_DIR is unset the inherited TMPDIR
+# stands, and sccache's own refusal names the cause.
+RUSTFLAGS="-C target-cpu=native" TMPDIR="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}" \
+    cargo +nightly build -p mork_ffi --release
 
 # The engine reaches this library through exactly one entry point, so its
 # absence means the crate built into something the backend cannot call. Checked
