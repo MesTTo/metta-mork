@@ -49,6 +49,10 @@ command -v swipl >/dev/null || {
 seat_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 project_dir=$(CDPATH= cd -- "$seat_dir/../.." && pwd)
 
+# One spelling of the bound, implemented in bounded.sh, which every runner in
+# this tree and a command typed by hand all reach.
+bounded() { sh "$project_dir/bounded.sh" "$@"; }
+
 probe=$(mktemp -d "${TMPDIR:-/tmp}/mork-missing-artefacts.XXXXXX")
 trap 'rm -rf "$probe"' EXIT HUP INT TERM
 
@@ -75,7 +79,8 @@ build_tree() {
 
 boot() {
     tree="$1"; goal="$2"
-    timeout 250 swipl -q -g "$goal" -t halt -s "$tree/engine/metta.pl" -- extensions
+    bounded --ceiling 250 \
+        swipl -q -g "$goal" -t halt -s "$tree/engine/metta.pl" -- extensions
 }
 
 fail() {
@@ -195,7 +200,7 @@ case "$staged" in
             "loaded with no mork/3 behind it, and it answered: $staged" ;;
 esac
 
-if timeout 250 swipl -g run_tests -t halt \
+if bounded --ceiling 250 swipl -g run_tests -t halt \
         "$control/extensions/mork/tests/mork_seat.plt" -- extensions \
         > "$probe/control.log" 2>&1
 then

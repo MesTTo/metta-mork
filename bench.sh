@@ -63,6 +63,10 @@ fi
 # mork-window-floor. Purging without regenerating measures a SOURCE boot, which
 # moves mork-batch-add-500 by -3.6% and mork-native-add-2000 by +1.2%, both far
 # outside their 1% band [measured 2026-08-29, one A/B per half].
-swipl -g halt -s "$HERE/../../engine/main.pl" -- extensions >/dev/null 2>&1 || true
+# One spelling of the bound, implemented in bounded.sh, which every runner in
+# this tree and a command typed by hand all reach.
+bounded() { sh "$HERE/../../bounded.sh" "$@"; }
 
-exec "$PY" "$HERE/benchmarks/bench.py" "$@"
+bounded swipl -g halt -s "$HERE/../../engine/main.pl" -- extensions >/dev/null 2>&1 || true
+
+exec sh "$HERE/../../bounded.sh" "$PY" "$HERE/benchmarks/bench.py" "$@"
