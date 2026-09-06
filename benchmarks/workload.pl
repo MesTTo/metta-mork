@@ -11,6 +11,11 @@
 %     [source: extensions/python/metta/benchmarking.py, measure_instructions'
 %     controlled=True branch].
 % Guarantees:
+%   - a window that never opened exits 125 rather than failing as a workload:
+%     the driver reads that as "this run says nothing" instead of as a moved
+%     row, which is what keeps PMU contention on a shared box from reporting a
+%     code change that did not happen
+%     [tested: extensions/mork/bench.sh; commit=WORKTREE].
 %   - the setup is OUTSIDE the measured region and the operation is inside it,
 %     so what a sample counts is the operation. Whole-process subtraction was
 %     tried first and is not usable at this resolution: the same difference
@@ -354,6 +359,23 @@ main :-
                 measure a boot; run sh extensions/mork/build.sh~n", []),
         halt(5)
     ),
-    bench_run(Case, Size, Phase).
+    catch(bench_run(Case, Size, Phase),
+          error(io_error(read, perf_control), Context),
+          bench_unmeasured(Context)).
+
+%A window that never opened measured NOTHING, which is a different answer from
+%a workload that ran and answered wrongly, and the driver has to be able to
+%tell them apart: read as a regression, PMU contention on a shared box reports
+%a code change that did not happen. 125 is the status this tree already reads
+%as "the wrapper failed rather than the command" -- timeout(1) uses it for a
+%failure in itself, `git bisect run` reads it as "this run says nothing about
+%the commit", and bounded.sh refuses with it when the process that started a
+%command had already exited. metta.benchmarking names the same number
+%PERF_CONTROL_REFUSED and turns it into a skip [source: coreutils timeout(1)
+%EXIT STATUS; git-bisect(1), "run <cmd>"; extensions/python/metta/
+%benchmarking.py, PERF_CONTROL_REFUSED].
+bench_unmeasured(context(_, Message-Cause)) :-
+    format(user_error, "workload.pl: ~w (~w)~n", [Message, Cause]),
+    halt(125).
 
 :- initialization(main, main).

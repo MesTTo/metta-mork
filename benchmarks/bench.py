@@ -24,6 +24,11 @@ and -714,626 under LC_ALL=C.UTF-8, three stable modes selected by the
 environment block rather than by any work [measured 2026-08-28, the flush case
 at 500]. Inside the window the same operation repeats within 0.018%.
 Guarantees:
+  - a box that would not count is told apart from a tree that moved: this
+    lane exits 0 with a named skip on a developer's box and 1 where CI=true,
+    and never reports a refused measurement as a moved row
+    [tested: test_a_benchmark_lane_skips_a_refusal_locally_and_refuses_it_in_ci;
+    commit=WORKTREE]
   - the measured region holds the operation, because
     extensions/mork/benchmarks/workload.pl runs the setup before it opens the
     window [tested: extensions/mork/bench.sh]
@@ -65,6 +70,7 @@ sys.path.insert(0, str(ROOT / "extensions" / "python"))
 from metta.testing import (  # noqa: E402  -- the sys.path line above is what makes this importable
     BenchmarkBaseline,
     measure_instructions,
+    measured_main,
 )
 
 SIZES = (500, 2000, 8000)
@@ -365,4 +371,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(measured_main(main))
