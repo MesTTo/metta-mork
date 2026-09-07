@@ -15,7 +15,7 @@
 %     the driver reads that as "this run says nothing" instead of as a moved
 %     row, which is what keeps PMU contention on a shared box from reporting a
 %     code change that did not happen
-%     [tested: extensions/mork/bench.sh; commit=WORKTREE].
+%     [tested: extensions/mork/bench.sh; commit=11afdcdbad5bbbe37168b5d8528c23a21c42b4b6].
 %   - the setup is OUTSIDE the measured region and the operation is inside it,
 %     so what a sample counts is the operation. Whole-process subtraction was
 %     tried first and is not usable at this resolution: the same difference

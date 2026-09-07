@@ -28,7 +28,7 @@ Guarantees:
     lane exits 0 with a named skip on a developer's box and 1 where CI=true,
     and never reports a refused measurement as a moved row
     [tested: test_a_benchmark_lane_skips_a_refusal_locally_and_refuses_it_in_ci;
-    commit=WORKTREE]
+    commit=11afdcdbad5bbbe37168b5d8528c23a21c42b4b6]
   - the measured region holds the operation, because
     extensions/mork/benchmarks/workload.pl runs the setup before it opens the
     window [tested: extensions/mork/bench.sh]
