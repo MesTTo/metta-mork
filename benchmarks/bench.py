@@ -26,7 +26,7 @@ at 500]. Inside the window the same operation repeats within 0.018%.
 Guarantees:
   - both conjunction routes run at four fixed sizes, check the complete result
     bag in setup, and retain every size as a two-sided instruction pin
-    [tested: extensions/mork/tests/test_benchmarks.py; commit=WORKTREE]
+    [tested: extensions/mork/tests/test_benchmarks.py; commit=6da518669cb9e39557d537857c0aa7190dd2e78f]
   - a box that would not count is told apart from a tree that moved: this
     lane exits 0 with a named skip on a developer's box and 1 where CI=true,
     and never reports a refused measurement as a moved row

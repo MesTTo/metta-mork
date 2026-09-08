@@ -39,7 +39,7 @@
 %     extensions/mork/bench.sh].
 %   - each conjunction setup checks every projected triple against its graph
 %     before measuring the shared-variable join through match/4
-%     [tested: extensions/mork/tests/test_benchmarks.py; commit=WORKTREE].
+%     [tested: extensions/mork/tests/test_benchmarks.py; commit=6da518669cb9e39557d537857c0aa7190dd2e78f].
 % Owns resources:
 %   - the two /dev/fd streams the window opens, closed by setup_call_cleanup/3
 %     whether the operation succeeds, fails or throws. The inherited descriptors

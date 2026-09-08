@@ -4,10 +4,10 @@
 // Guarantees: scratch allocations grow with the encoded request or answer,
 // and `drop-space` destroys the named registry entry rather than clearing only
 // its visible atoms. [source: extensions/mork/mork_ffi/src/lib.rs,
-// query_multi_sexpr and rust_mork; commit=WORKTREE]
+// query_multi_sexpr and rust_mork; commit=6da518669cb9e39557d537857c0aa7190dd2e78f]
 // Guarantees: pattern_cycles_and_intros preserves full pattern application
 // before template instantiation, including schematic bindings.
-// [tested: sh check.sh mork-rust; commit=WORKTREE]
+// [tested: sh check.sh mork-rust; commit=6da518669cb9e39557d537857c0aa7190dd2e78f]
 // Owns resources: GLOBAL_SPACES owns each Space until `drop-space`; OUTBUF owns
 // one reusable answer allocation per calling thread.
 // Guarded by: the GLOBAL_SPACES mutex serializes registry and Space mutation.

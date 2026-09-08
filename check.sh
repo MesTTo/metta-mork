@@ -11,7 +11,7 @@
 #   and resolving $HERE/, so a path reached through a local variable is a path
 #   the evidence gate cannot see.
 # Guarantees: the benchmark selftest rejects altered counts, incomplete sweeps,
-#   and wrong answer bags [tested: sh check.sh mork-bench-selftest; commit=WORKTREE].
+#   and wrong answer bags [tested: sh check.sh mork-bench-selftest; commit=6da518669cb9e39557d537857c0aa7190dd2e78f].
 # Open Obligations:
 #   To Do: None
 #   Hacks: None

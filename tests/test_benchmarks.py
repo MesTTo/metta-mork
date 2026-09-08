@@ -1,7 +1,7 @@
 """Purpose: prove the MORK benchmark measures and gates its conjunction sweep.
 
 Guarantees: both stores check complete answer bags, and planted changes to any
-size's counter fail in either direction [tested: sh check.sh mork-bench-selftest; commit=WORKTREE].
+size's counter fail in either direction [tested: sh check.sh mork-bench-selftest; commit=6da518669cb9e39557d537857c0aa7190dd2e78f].
 Owns resources: each test process owns its stores until exit. Temporary baseline
 files stay below the repository's scratch and are removed after each test.
 """

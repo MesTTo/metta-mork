@@ -4,14 +4,14 @@
 %   - the engine consults seam:foreign_space/1 before its own storage, and
 %     its foreign match clause offers whole conjunctions to foreign_plan/5,
 %     splits declined plans, and enumerates an unbound pattern
-%     [source: engine/spaces/foreign.pl, match_foreign/4; commit=WORKTREE]
+%     [source: engine/spaces/foreign.pl, match_foreign/4; commit=6da518669cb9e39557d537857c0aa7190dd2e78f]
 % Guarantees:
 %   - a MORK space refuses an unbound space name the way a native one does
-%     [tested: spaces_storage_modules:matching_requires_a_named_space; commit=WORKTREE].
+%     [tested: spaces_storage_modules:matching_requires_a_named_space; commit=6da518669cb9e39557d537857c0aa7190dd2e78f].
 %   - a space this backend does not own leaves every ownership seam here by
 %     FAILING, so the next provider's clause runs and no value is refused on
 %     its behalf
-%     [tested: test_a_query_joins_stored_atoms_with_live_object_fields; commit=WORKTREE].
+%     [tested: test_a_query_joins_stored_atoms_with_live_object_fields; commit=6da518669cb9e39557d537857c0aa7190dd2e78f].
 % Open Obligations:
 %   To Do: None
 %   Hacks: None
