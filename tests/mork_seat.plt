@@ -2,6 +2,9 @@
 %   it takes over the &mork namespace, and the failure discipline that lets the
 %   next provider's clause run for a space it does not own.
 % Assumes:
+%   - private seat-path and builtin-effect probes name their owner metta_engine
+%     [tested: the_seat_loads_wherever_the_boot_reads_seats_and_both_artefacts_exist,
+%     the_three_declared_builtins_are_registered_with_their_classes; commit=ede2ac57e213a0d4502c6bbbca6227f97015b720].
 %   - loaded with the `extensions` token in argv, which is what makes the
 %     engine read extensions/mork/extension.pl at all; a tokenless boot is the
 %     pure kernel and every test here is skipped by seat_is_loaded/0
@@ -50,7 +53,7 @@ seat_is_loaded :- metta_extension_loaded(mork).
 mork_artefacts_present :-
     forall(member(Relative, ['mork_ffi/target/release/libmork_ffi.so',
                              'mork_ffi/morklib.so']),
-           ( metta_extension_seat_file(mork, Relative, Path, _),
+           ( metta_engine:metta_extension_seat_file(mork, Relative, Path, _),
              exists_file(Path) )).
 
 %The two tests here that run in every configuration, including the tokenless
@@ -110,7 +113,7 @@ test(the_three_declared_builtins_are_registered_with_their_classes,
                                'mm2-exec'-oracleIO]),
            ( assertion(builtin_fun(Name)),
              assertion(seam:extension_builtin(Name, Class)),
-             assertion(metta_builtin_effect(Name, Class)) )).
+             assertion(metta_engine:metta_builtin_effect(Name, Class)) )).
 
 %Every storage capability the seat says it has. Read whole rather than one at a
 %time, so a capability silently dropped from the list fails here.
