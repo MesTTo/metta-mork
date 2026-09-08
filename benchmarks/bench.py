@@ -64,10 +64,16 @@ BASELINE = SEAT / "benchmarks" / "baseline.json"
 # The harness lives in the Python seat and is imported rather than copied, as
 # DEVELOPING.md requires. The path is prepended here because measure_instructions
 # builds its child's environment from an allowlist that carries no PYTHONPATH,
-# so a caller could not pass the seat down that way either.
+# so a caller could not pass the seat down that way either. It is a distribution
+# of its own under that seat's ext/, so the entry only makes _workspace
+# reachable and on_path() puts every member beside it.
 sys.path.insert(0, str(ROOT / "extensions" / "python"))
 
-from metta.testing import (  # noqa: E402  -- the sys.path line above is what makes this importable
+from _workspace import on_path  # noqa: E402  -- the path entry above
+
+on_path()
+
+from metta_benchmarking import (  # noqa: E402  -- on_path() above is what makes this importable
     BenchmarkBaseline,
     measure_instructions,
     measured_main,
