@@ -149,7 +149,6 @@ At the published pair above, measured on 2026-09-08:
 These are retired instructions for one query. Native exhibits linear growth
 and MORK quadratic growth over this family. The old-pair control gives the
 same classes. The [pin journal](https://github.com/MesTTo/MeTTa-Kernel/blob/f0d33dcad438f91556459ba43c80212d9b46b760/docs/journal/2026-09-08-the-mork-pin-advanced.md)
-same classes. The [pin journal](https://github.com/MesTTo/MeTTa-Kernel/blob/6da518669cb9e39557d537857c0aa7190dd2e78f/docs/journal/2026-09-08-the-mork-pin-advanced.md)
 records both pairs, every original row's change and the controls. The simpler
 two-edge path graph is linear on both pairs, so it cannot replace this skewed
 fixture when assessing a join algorithm.
