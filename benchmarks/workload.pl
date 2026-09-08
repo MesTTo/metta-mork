@@ -37,6 +37,9 @@
 %     silently wrote or matched nothing halts nonzero instead of measuring an
 %     empty window [tested: extensions/mork/benchmarks/bench.py, run by
 %     extensions/mork/bench.sh].
+%   - each conjunction setup checks every projected triple against its graph
+%     before measuring the shared-variable join through match/4
+%     [tested: extensions/mork/tests/test_benchmarks.py; commit=WORKTREE].
 % Owns resources:
 %   - the two /dev/fd streams the window opens, closed by setup_call_cleanup/3
 %     whether the operation succeeds, fails or throws. The inherited descriptors
@@ -140,6 +143,18 @@ bench_case('native-match-open', Size,
            bench_count(Space, [edge, _, _], Count), Count, Size) :-
     native_space('native-match-open', Size, Space).
 
+%A two-hub graph has Size atoms and no triangles. The product join explores
+%the incoming/outgoing pairs before the closing edge refutes each candidate.
+bench_case('mork-conjunction', Size,
+           ( bench_join_fill(Space, Size), bench_check_join(Space, Size) ),
+           bench_join_count(Space, Count), Count, 0) :-
+    mork_space('mork-conjunction', Size, Space).
+
+bench_case('native-conjunction', Size,
+           ( bench_join_fill(Space, Size), bench_check_join(Space, Size) ),
+           bench_join_count(Space, Count), Count, 0) :-
+    native_space('native-conjunction', Size, Space).
+
 %Flush is the one case whose setup must NOT flush: what it measures is the cost
 %of publishing writes that are still queued.
 bench_case(flush, Size, bench_queue(Space, Size),
@@ -175,6 +190,40 @@ bench_one_by_one(Space, Rows, Count) :-
 %[measured 2026-08-28]. Warming both sides keeps the comparison symmetrical.
 bench_count(Space, Pattern, Count) :-
     aggregate_all(count, match(Space, Pattern, Pattern, _), Count).
+
+bench_join_fill(Space, Size) :-
+    Size >= 2,
+    Half is Size // 2,
+    forall(between(1, Size, I),
+           ( (I =< Half -> Row = [edge, I, 0]; Row = [edge, 0, I]),
+             'add-atom'(Space, Row, _) )).
+
+bench_join(Space, Triple) :-
+    match(Space, [',', [edge, X, Y], [edge, Y, Z], [edge, Z, X]],
+          [X, Y, Z], Triple).
+
+bench_join_count(Space, Count) :-
+    aggregate_all(count, bench_join(Space, _), Count).
+
+%Plant one closing edge and require all three rotations of its triangle.
+%An always-empty query cannot pass this control. Remove the witness even on
+%failure, then warm and check the empty bag measured inside the window.
+bench_check_join(Space, Size) :-
+    Vertex is Size // 2 + 1,
+    Closing = [edge, Vertex, 1],
+    setup_call_cleanup(
+        'add-atom'(Space, Closing, _),
+        bench_join_answers(Space, [[0, Vertex, 1], [1, 0, Vertex], [Vertex, 1, 0]]),
+        'remove-atom'(Space, Closing, _)),
+    bench_join_answers(Space, []).
+
+bench_join_answers(Space, Expected) :-
+    findall(Triple, bench_join(Space, Triple), Found),
+    msort(Found, Sorted),
+    ( Sorted == Expected
+      -> true
+    ; throw(error(domain_error(conjunction_answers, Found),
+                  context(bench_join_answers/2, expected(Expected)))) ).
 
 %A selective query answers ONE row, and one of those is too small to measure
 %against the window's own handshake: native-match-first at 8000 read 12,527

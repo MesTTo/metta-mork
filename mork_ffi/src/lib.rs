@@ -3,15 +3,18 @@
 // the Prolog provider checks those limits before crossing the boundary.
 // Guarantees: scratch allocations grow with the encoded request or answer,
 // and `drop-space` destroys the named registry entry rather than clearing only
-// its visible atoms. [source: MORK/kernel/src/space.rs, Space::query_multi_raw;
-// commit=d843bb6d17a525c36afd21cab077d63b34447535]
+// its visible atoms. [source: extensions/mork/mork_ffi/src/lib.rs,
+// query_multi_sexpr and rust_mork; commit=WORKTREE]
+// Guarantees: pattern_cycles_and_intros preserves full pattern application
+// before template instantiation, including schematic bindings.
+// [tested: sh check.sh mork-rust; commit=WORKTREE]
 // Owns resources: GLOBAL_SPACES owns each Space until `drop-space`; OUTBUF owns
 // one reusable answer allocation per calling thread.
 // Guarded by: the GLOBAL_SPACES mutex serializes registry and Space mutation.
 // Decides: parser failures returned by `Parser` cross the C ABI as `ERR`.
 
 use mork::space::{ParDataParser, Space};
-use mork_expr::{item_byte, Expr, ExprEnv, ExprZipper, Tag};
+use mork_expr::{item_byte, pattern_cycles_and_intros, Expr, ExprEnv, ExprZipper, Tag, VecSink};
 use mork_frontend::bytestring_parser::{Context, Parser, ParserError};
 use pathmap::zipper::ProductZipper;
 use std::cell::RefCell;
@@ -152,7 +155,7 @@ fn parse_query(
     Ok(Some((pattern, template)))
 }
 
-//MORK's own worst-case-optimal conjunctive query, answered read-only.
+//MORK's product join, answered read-only.
 //
 //Space::dump_sexpr already runs this engine. It wraps the caller's single
 //pattern into a ONE-factor (, pattern) and hands that to Space::query_multi,
@@ -189,6 +192,7 @@ fn query_multi_sexpr<W: std::io::Write>(
     let mut buffer = Vec::new();
     let mut stack = Vec::new();
     let mut assignments = Vec::new();
+    let pattern_variables = pattern.newvars();
     Space::query_multi_raw(
         &mut product,
         &pattern_args[1..],
@@ -196,31 +200,29 @@ fn query_multi_sexpr<W: std::io::Write>(
             match refs_bindings {
                 Ok(_refs) => break 'query true,
                 Err(ref bindings) => {
-                    //The PATTERN is applied first for its variable numbering, and
-                    //the template applied at the offsets that produces. Applying
-                    //the template alone renumbers its variables independently and
-                    //the row comes back with the wrong bindings.
-                    buffer.clear();
-                    let (oi, ni, true) = mork_expr::apply_e_clears_stacks_and_cycles_check!(
-                        0,
-                        0,
-                        0,
-                        pattern,
+                    // Count pattern introductions and check cycles without emitting
+                    // bytes that would immediately be discarded. This is the same
+                    // pass as Space::dump_sexpr at the published pin:
+                    // https://github.com/trueagi-io/MORK/blob/f17d3d0d4c3a48baba5acf4844ba18c1fc5ff9b1/kernel/src/space.rs
+                    let Some((oi, ni)) = pattern_cycles_and_intros(
+                        pattern_variables as u8,
                         bindings,
-                        buffer,
-                        stack,
-                        assignments
+                        &mut stack,
+                        &mut assignments,
                     ) else {
                         break 'query true;
                     };
                     buffer.clear();
+                    // ItemSink replaced std::io::Write in upstream 312a048:
+                    // https://github.com/trueagi-io/MORK/blob/312a0486138cc2378ade61d89486f10db8771b24/expr/src/lib_nightly.rs
+                    let mut sink = VecSink(&mut buffer);
                     let (_, _, true) = mork_expr::apply_e_clears_stacks_and_cycles_check!(
                         0,
                         oi,
                         ni,
                         template,
                         bindings,
-                        buffer,
+                        sink,
                         stack,
                         assignments
                     ) else {
@@ -548,5 +550,49 @@ mod tests {
         let answers = String::from_utf8(answers).unwrap();
         assert!(answers.contains("(answer tim)\n"));
         assert!(answers.contains("(answer joe)\n"));
+    }
+
+    #[test]
+    fn specialized_pattern_pass_matches_full_application() {
+        // The old adapter emitted the full pattern before applying the template.
+        // Compare its accounting with the new pass on both ground and schematic
+        // bindings, repeated variables, nested terms, and independent variables.
+        let fixtures: &[(&[u8], &[u8])] = &[
+            (b"(edge a b) (edge b c)", b"((, (edge $x $y) (edge $y $z)) ($z $x $y))"),
+            (b"(pair $a $a)", b"((, (pair $x $y)) ($y $x))"),
+            (b"(pair (f $a) $a)", b"((, (pair $x $y)) ($x $y $new))"),
+            (b"(pair $a $b)", b"((, (pair $x $y)) ($y $x $y))"),
+            (b"(tag a)", b"((, (tag a)) ($new $new))"),
+        ];
+        for &(data, query) in fixtures {
+            let mut space = Space::new();
+            load_all_sexpr(&mut space, data, true).unwrap();
+            let mut parsebuf = vec![0; query.len() + 1];
+            let (pattern, _) = parse_query(&space, query, &mut parsebuf).unwrap().unwrap();
+            let mut args = Vec::new();
+            ExprEnv::new(0, pattern).args(&mut args);
+            let mut product = ProductZipper::new(
+                space.btm.read_zipper(),
+                (0..args.len() - 2).map(|_| space.btm.read_zipper()),
+            );
+            let mut checked = 0;
+            Space::query_multi_raw(&mut product, &args[1..], |found, _| {
+                let bindings = found.unwrap_err();
+                let mut bytes = Vec::new();
+                let mut sink = VecSink(&mut bytes);
+                let mut stack = Vec::new();
+                let mut assignments = Vec::new();
+                let (oi, ni, acyclic) = mork_expr::apply_e_clears_stacks_and_cycles_check!(
+                    0, 0, 0, pattern, bindings, sink, stack, assignments
+                );
+                let specialized = pattern_cycles_and_intros(
+                    pattern.newvars() as u8, bindings, &mut stack, &mut assignments,
+                );
+                assert_eq!(specialized, acyclic.then_some((oi, ni)));
+                checked += 1;
+                true
+            });
+            assert!(checked > 0, "fixture must exercise a binding: {query:?}");
+        }
     }
 }
