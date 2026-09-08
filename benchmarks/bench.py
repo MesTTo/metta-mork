@@ -24,6 +24,9 @@ and -714,626 under LC_ALL=C.UTF-8, three stable modes selected by the
 environment block rather than by any work [measured 2026-08-28, the flush case
 at 500]. Inside the window the same operation repeats within 0.018%.
 Guarantees:
+  - both conjunction routes run at four fixed sizes, check the complete result
+    bag in setup, and retain every size as a two-sided instruction pin
+    [tested: extensions/mork/tests/test_benchmarks.py; commit=6da518669cb9e39557d537857c0aa7190dd2e78f]
   - a box that would not count is told apart from a tree that moved: this
     lane exits 0 with a named skip on a developer's box and 1 where CI=true,
     and never reports a refused measurement as a moved row
@@ -54,7 +57,9 @@ import re
 import subprocess
 import sys
 from dataclasses import dataclass
+from math import log
 from pathlib import Path
+from statistics import linear_regression
 
 SEAT = Path(__file__).resolve().parents[1]
 ROOT = SEAT.parents[1]
@@ -80,7 +85,20 @@ from metta_benchmarking import (  # noqa: E402  -- on_path() above is what makes
 )
 
 SIZES = (500, 2000, 8000)
+JOIN_SIZES = (100, 400, 1600, 3200)
+JOIN_CASES = ("native-conjunction", "mork-conjunction")
 ROUNDS = 3
+POLICIES = {
+    "counter_policy": (
+        "instructions:u minimum of three decides foreign and native work; "
+        "inferences separately pin Prolog work within the fixed allowance; "
+        "CPU seconds advise"
+    ),
+    "instruction_policy": (
+        "perf instructions:u minimum of three in a controlled window, net of "
+        "the window floor; two-sided one percent band unless a row declares its own"
+    ),
+}
 
 # Every case. The pairs below are the point: a row on its own says what
 # something costs, and a pair says whether the backend earns its crossing.
@@ -137,7 +155,7 @@ class Row:
         return min(self.instructions) / self.operations
 
 
-def configuration() -> dict[str, bool]:
+def configuration() -> dict[str, bool | list[str]]:
     """The artifacts whose presence moves these counters.
 
     Both MORK objects, because without them the seat is not loaded and there is
@@ -145,6 +163,17 @@ def configuration() -> dict[str, bool]:
     and sread/2 sit inside every crossing measured here -- each atom is written
     to text on the way into MORK and read back from text on the way out.
     """
+    loaded = subprocess.run(
+        [
+            "swipl", "-q", "-s", str(ROOT / "engine" / "metta.pl"),
+            "-g", "findall(S,metta_extension_loaded(S),Ss),sort(Ss,Sorted),"
+            "maplist(writeln,Sorted)", "-t", "halt", "--", "extensions",
+        ],
+        capture_output=True, text=True, check=True,
+    )
+    if "ERROR:" in loaded.stderr:
+        msg = f"the measurement configuration failed to load: {loaded.stderr.strip()}"
+        raise RuntimeError(msg)
     return {
         "c_reader": (ROOT / "engine" / "reader.so").is_file()
         and os.environ.get("METTA_C_READER") != "off",
@@ -152,6 +181,7 @@ def configuration() -> dict[str, bool]:
         and os.environ.get("METTA_C_WRITER") != "off",
         "mork_ffi": (SEAT / "mork_ffi" / "target" / "release" / "libmork_ffi.so").is_file(),
         "morklib": (SEAT / "mork_ffi" / "morklib.so").is_file(),
+        "seats": loaded.stdout.splitlines(),
     }
 
 
@@ -230,6 +260,7 @@ def measure(sizes: tuple[int, ...], rounds: int) -> dict[str, Row]:
     every other row: what is left is the operation, and what stays in the floor
     row is the handshake, which moves for its own reasons and says so by name.
     """
+    load_before = Path("/proc/loadavg").read_text().strip()
     floor_samples = windowed("window-floor", sizes[0], rounds)
     floor_inferences, floor_cpu = counters("window-floor", sizes[0], rounds)
     floor = min(floor_samples)
@@ -238,34 +269,43 @@ def measure(sizes: tuple[int, ...], rounds: int) -> dict[str, Row]:
             "mork-window-floor", "windows", 1, floor_samples, floor_inferences, floor_cpu
         )
     }
-    print(f"mork-window-floor: instructions={floor_samples}")
-    for size in sizes:
-        for case in CASES:
-            operations = QUERIES if case in SELECTIVE else size
-            raw = windowed(case, size, rounds)
-            instructions = [sample - floor for sample in raw]
-            if any(value <= 0 for value in instructions):
-                msg = (
-                    f"{case} at {size} measured {raw!r}, at or below the "
-                    f"{floor} instruction window floor: this case is the "
-                    f"handshake and not a workload"
-                )
-                raise RuntimeError(msg)
-            inferences, cpu = counters(case, size, rounds)
-            name = row_name(case, size)
-            unit = "queries" if case in SELECTIVE else "operations"
-            rows[name] = Row(name, unit, operations, instructions, inferences, cpu)
-            print(
-                f"{name}: instructions={instructions} raw={raw} "
-                f"inferences={inferences} cpu={cpu:.6f}s"
+    print(
+        f"mork-window-floor: instructions={floor_samples} "
+        f"inferences={floor_inferences} cpu={floor_cpu:.9f}s "
+        f"loadavg_before={load_before}; "
+        f"loadavg_after={Path('/proc/loadavg').read_text().strip()}"
+    )
+    schedule = [(case, size) for size in sizes for case in CASES]
+    schedule.extend((case, size) for size in JOIN_SIZES for case in JOIN_CASES)
+    for case, size in schedule:
+        operations = QUERIES if case in SELECTIVE else 1 if case in JOIN_CASES else size
+        load_before = Path("/proc/loadavg").read_text().strip()
+        raw = windowed(case, size, rounds)
+        instructions = [sample - floor for sample in raw]
+        if any(value <= 0 for value in instructions):
+            msg = (
+                f"{case} at {size} measured {raw!r}, at or below the "
+                f"{floor} instruction window floor: this case is the "
+                f"handshake and not a workload"
             )
+            raise RuntimeError(msg)
+        inferences, cpu = counters(case, size, rounds)
+        name = row_name(case, size)
+        unit = "queries" if case in SELECTIVE or case in JOIN_CASES else "operations"
+        rows[name] = Row(name, unit, operations, instructions, inferences, cpu)
+        print(
+            f"{name}: instructions={instructions} raw={raw} "
+            f"inferences={inferences} cpu={cpu:.9f}s "
+            f"loadavg_before={load_before}; "
+            f"loadavg_after={Path('/proc/loadavg').read_text().strip()}"
+        )
     return rows
 
 
 def compare(rows: dict[str, Row], *, update: bool, whole_ladder: bool) -> list[str]:
     """Hold every row to its pin. Answers one message per failing row."""
-    baseline = BenchmarkBaseline(BASELINE, update=update)
-    baseline.observe_configuration(configuration())
+    baseline = BenchmarkBaseline(BASELINE, update=update, policies=POLICIES)
+    baseline.observe_configuration(configuration(), stamp=update and whole_ladder)
     failures: list[str] = []
     for row in rows.values():
         try:
@@ -288,7 +328,7 @@ def compare(rows: dict[str, Row], *, update: bool, whole_ladder: bool) -> list[s
     # case or a dropped size. Only the whole ladder can say a row is stale: a
     # deliberate subset run measures fewer rows on purpose.
     stale = sorted(set(baseline.cases) - set(rows))
-    if stale and update:
+    if stale and update and whole_ladder:
         for name in stale:
             baseline.remove_case(name)
         print(f"pruned unmeasured baseline row(s): {', '.join(stale)}")
@@ -299,6 +339,21 @@ def compare(rows: dict[str, Row], *, update: bool, whole_ladder: bool) -> list[s
         )
     baseline.finish()
     return failures
+
+
+def join_exponents(rows: dict[str, Row]) -> dict[str, float]:
+    """Fit total join instructions to N**p across the four declared sizes.
+
+    The standard-library least-squares fit over logarithms estimates p. It
+    describes these sizes; the individual row pins gate subsequent movement.
+    """
+    return {
+        case: linear_regression(
+            [log(size) for size in JOIN_SIZES],
+            [log(min(rows[row_name(case, size)].instructions)) for size in JOIN_SIZES],
+        ).slope
+        for case in JOIN_CASES
+    }
 
 
 def report(rows: dict[str, Row], sizes: tuple[int, ...]) -> None:
@@ -341,6 +396,18 @@ def report(rows: dict[str, Row], sizes: tuple[int, ...]) -> None:
             f"| {case} | {min(row.inferences) / row.operations:,.1f} | "
             f"{row.cpu / row.operations * 1e6:.3f} | {row.per_operation():,.0f} |"
         )
+    print()
+    print(
+        "| skewed triangle | " + " | ".join(str(size) for size in JOIN_SIZES)
+        + " | fitted exponent |"
+    )
+    print("|---" * (len(JOIN_SIZES) + 2) + "|")
+    for case, exponent in join_exponents(rows).items():
+        cells = [min(rows[row_name(case, size)].instructions) for size in JOIN_SIZES]
+        print(
+            f"| {case} | " + " | ".join(f"{cell:,}" for cell in cells)
+            + f" | {exponent:.4f} |"
+        )
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -354,6 +421,10 @@ def main(argv: list[str] | None = None) -> int:
         default=SIZES,
     )
     arguments = parser.parse_args(argv)
+    if arguments.rounds < 1 or not arguments.sizes or any(size < 1 for size in arguments.sizes):
+        parser.error("rounds and sizes must be positive")
+    if arguments.update and tuple(arguments.sizes) != SIZES:
+        parser.error("--update requires the complete default size set to preserve every row")
 
     # What else the box was doing, recorded with every run rather than
     # remembered: instructions:u is far steadier than wall clock but the two

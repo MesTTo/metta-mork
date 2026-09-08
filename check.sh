@@ -1,5 +1,7 @@
 # Purpose: this component's own gate lanes, in the root gate's vocabulary.
-# Assumes: it is SOURCED by check.sh, not executed. That is what lets it use
+# Assumes: the root check.sh supplies the runner when sourcing this file.
+#   Direct invocation delegates to that runner with this seat's lane names.
+#   That is what lets it use
 #   `run`, `$HERE`, `$PY` and the shared summary table, so one component's lanes
 #   cannot report their own status differently from another's, and a child's
 #   exit code cannot be lost on the way back up -- the hazard a driver that
@@ -8,10 +10,20 @@
 #   evidence_runners.py models which files a lane covers by READING this text
 #   and resolving $HERE/, so a path reached through a local variable is a path
 #   the evidence gate cannot see.
+# Guarantees: the benchmark selftest rejects altered counts, incomplete sweeps,
+#   and wrong answer bags [tested: sh check.sh mork-bench-selftest; commit=6da518669cb9e39557d537857c0aa7190dd2e78f].
 # Open Obligations:
 #   To Do: None
 #   Hacks: None
 #   Future Enhancements: None
+
+if ! command -v run >/dev/null 2>&1; then
+    MORK_HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+    if [ "$#" -eq 0 ]; then
+        set -- mork-seat mork-bench mork-lint mork-bench-selftest mork-rust
+    fi
+    exec sh "$MORK_HERE/../../check.sh" "$@"
+fi
 
 # The MORK backend, which is the seam's storage consumer: named spaces whose
 # atoms live in MORK's Rust trie instead of the engine's own store, reached over
@@ -57,6 +69,20 @@ run GATE mork-bench check_mork_bench
 check_mork_lint() {
     [ -f "$HERE/extensions/python/pyproject.toml" ] || return 0
     bounded "$PY" -m ruff check --config "$HERE/extensions/python/pyproject.toml" \
-        "$HERE/extensions/mork/benchmarks/bench.py"
+        "$HERE/extensions/mork/benchmarks/bench.py" \
+        "$HERE/extensions/mork/tests/test_benchmarks.py"
 }
 run GATE mork-lint check_mork_lint
+
+run GATE mork-bench-selftest "$PY" "$HERE/extensions/mork/tests/test_benchmarks.py"
+
+# Serialize the upstream expression tests because its scratch counters are
+# process globals. The committed lock holds the same graph as the cdylib.
+# Match mork_ffi/build.sh's short socket directory for rustc wrappers.
+check_mork_rust() {
+    RUSTFLAGS="-C target-cpu=native" TMPDIR="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}" \
+        bounded cargo +nightly test --locked \
+        --manifest-path "$HERE/extensions/mork/mork_ffi/Cargo.toml" \
+        --release --lib -- --test-threads=1
+}
+run GATE mork-rust check_mork_rust

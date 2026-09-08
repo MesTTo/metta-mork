@@ -2,16 +2,16 @@
 %   as a provider behind the engine's foreign-space seam.
 % Assumes:
 %   - the engine consults seam:foreign_space/1 before its own storage, and
-%     its foreign match clause splits conjunctions per conjunct and answers
-%     an unbound pattern through seam:foreign_atoms/2
-%     [source: engine/spaces.pl, match_foreign/4]
+%     its foreign match clause offers whole conjunctions to foreign_plan/5,
+%     splits declined plans, and enumerates an unbound pattern
+%     [source: engine/spaces/foreign.pl, match_foreign/4; commit=6da518669cb9e39557d537857c0aa7190dd2e78f]
 % Guarantees:
 %   - a MORK space refuses an unbound space name the way a native one does
-%     [tested: spaces_storage_modules:matching_requires_a_named_space].
+%     [tested: spaces_storage_modules:matching_requires_a_named_space; commit=6da518669cb9e39557d537857c0aa7190dd2e78f].
 %   - a space this backend does not own leaves every ownership seam here by
 %     FAILING, so the next provider's clause runs and no value is refused on
 %     its behalf
-%     [tested: test_a_query_joins_stored_atoms_with_live_object_fields].
+%     [tested: test_a_query_joins_stored_atoms_with_live_object_fields; commit=6da518669cb9e39557d537857c0aa7190dd2e78f].
 % Open Obligations:
 %   To Do: None
 %   Hacks: None
@@ -241,11 +241,9 @@ mork_holds(Space, Atom) :-
             -> seam:foreign_atoms(Space, Atom)
             ;  seam:foreign_match(Space, Atom, []) ).
 
-%Match one pattern, MORK's own matching rather than a scan. The engine
-%hands over one non-conjunctive, bound pattern at a time: it splits a
-%conjunction per conjunct and answers an unbound pattern through
-%seam:foreign_atoms/2, so joins over this space are the engine's joins,
-%each conjunct answered by MORK.
+%Match one written pattern. Whole conjunctions first reach foreign_plan/5
+%below; a declined plan reaches this door one conjunct at a time. An unbound
+%pattern is enumerated through seam:foreign_atoms/2.
 seam:foreign_match(Space, Pattern, _Options) :- mork_owns_space(Space),
                                        Pattern_Template = [Pattern, Pattern],
                                        mork_require_text_safe(Pattern_Template, match/4),
@@ -254,13 +252,10 @@ seam:foreign_match(Space, Pattern, _Options) :- mork_owns_space(Space),
                                        mork_response_term(Temp, MatchedPattern),
                                        Pattern = MatchedPattern.
 
-%MORK's own worst-case-optimal join, claimed WHOLE.
-%
-%The engine splits a conjunction one pattern at a time and re-dispatches the
-%next on every binding of the previous, which is a nested-loop plan. MORK's
-%query_multi is worst-case-optimal over the whole conjunction, so a partial
-%claim would hand the interesting half back as a nested loop; there is no shape
-%of conjunction where taking part of it beats taking all of it here.
+%MORK's product join, claimed whole. The published pin includes an optional
+%leapfrog feature, but this seat retains Space::query_multi_raw's product
+%dispatch. Its cost depends on the shape of the conjunction; the native/MORK
+%skewed triangle sweep records that growth in benchmarks/baseline.json.
 %
 %It declines rather than throws for anything it cannot express, which is what
 %the seam asks of a claim: an atom whose symbols do not survive MORK's text

@@ -45,6 +45,19 @@ tree's: the extension loads nothing and says nothing.
 
 ## Building it
 
+The root `build.sh` provisions and validates published upstream commits:
+
+| dependency | revision |
+|---|---|
+| MORK | `ed57c6716d8c510296fb5fbb8be6fbfe2df241d7` |
+| PathMap | `0010dbbd52d13fad67e9a7dabfdadb1cfea71fe1` |
+
+Both checkouts live beside this repository. `mork_ffi/Cargo.lock` pins the
+remaining dependency graph. The bridge uses MORK's `ItemSink` application API
+and PathMap 0.4.0. It retains the default `ProductZipper` query path; the
+optional upstream `leapfrog` feature is not enabled. These revisions are the
+published branch tips checked on 2026-09-08.
+
 ```sh
 sh extensions/mork/build.sh
 ```
@@ -77,6 +90,7 @@ loaded on demand with `!(import! &self (library lib_mm2))`.
 
 ```sh
 sh extensions/mork/test.sh
+sh extensions/mork/check.sh
 ```
 
 `tests/mork_seat.plt` covers the three builtins, the claim over the namespace,
@@ -85,6 +99,12 @@ this extension does not own. Every test in it is conditioned on the extension be
 loaded, so an unbuilt tree skips them. That is why `test.sh` says which
 configuration it ran and fails a built tree that reported anything less than the
 whole file.
+
+`check.sh` delegates to the root gate and runs this seat's tests, benchmark,
+lint, benchmark selftest and Rust unit tests. The selftest plants changed instruction counts
+on both sides of each sweep pin, a missing size, a wrong answer count, and
+wrong triples whose count is still correct. The Python MORK tests also compare
+projected join bags over generated ground graphs against native storage.
 
 `tests/test_missing_artefacts.sh` covers what a built tree cannot reach. It
 builds a scratch tree of symlinks whose extension is the shipped `extension.pl` and
@@ -106,6 +126,36 @@ sh extensions/mork/bench.sh --update     # re-pin after reviewing the workload
 Ten cases at three sizes, each measured inside perf's own control window so the
 boot and the setup are outside the count, and each held to
 `benchmarks/baseline.json`.
+
+Eight more rows measure a skewed triangle query over 100, 400, 1600 and 3200
+atoms, in a native store and a MORK store. For `H = N // 2`, both receive
+`edge(I, 0)` for `1 <= I <= H` and `edge(0, J)` for `H < J <= N`. The query
+`(edge X Y), (edge Y Z), (edge Z X)` answers no triangles. Setup plants one
+closing edge, checks the three projected rotations, removes it and verifies
+the empty answer before measuring. An always-empty query fails this control.
+One complete query runs inside the window. The report fits the four instruction
+minima to N raised to an exponent; each row's `measures` records the reviewed
+fit. It describes the measured sizes, not a bound over all inputs.
+
+At the published pair above, measured on 2026-09-08:
+
+| route | N=100 | N=400 | N=1600 | N=3200 | fitted exponent |
+|---|---:|---:|---:|---:|---:|
+| native | 1,009,928 | 3,915,471 | 15,537,045 | 31,065,221 | 0.988795 |
+| MORK | 7,997,175 | 122,623,865 | 1,567,416,445 | 7,508,864,472 | 1.951383 |
+
+These are retired instructions for one query. Native exhibits linear growth
+and MORK quadratic growth over this family. The old-pair control gives the
+same classes. The [pin journal](../../docs/journal/2026-09-08-the-mork-pin-advanced.md)
+records both pairs, every original row's change and the controls. The simpler
+two-edge path graph is linear on both pairs, so it cannot replace this skewed
+fixture when assessing a join algorithm.
+
+Every pin uses the minimum of three samples. The instruction bands are
+two-sided, so an improvement beyond the band also requires a reviewed re-pin.
+Load is printed before and after each row. `--sizes` explores the original
+crossing cases while the conjunction sweep retains its four sizes; `--update`
+requires the complete default set so it cannot erase unmeasured pins.
 
 **instructions:u decides every row and CPU is recorded beside it.** SWI's
 inference counter retires nothing for work done inside the Rust library, and
