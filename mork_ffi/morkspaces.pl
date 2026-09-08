@@ -18,7 +18,7 @@
 %   Future Enhancements: None
 
 % The provider owns its host-tier dependencies with global autoload disabled
-% [tested: sh check.sh no-autoload; commit=WORKTREE].
+% [tested: sh check.sh no-autoload; commit=ede2ac57e213a0d4502c6bbbca6227f97015b720].
 :- use_module(library(lists), [member/2]).
 :- use_module(library(apply), [maplist/2, maplist/3]).
 :- use_module(library(filesex), [directory_file_path/3]).

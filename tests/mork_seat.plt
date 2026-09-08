@@ -4,7 +4,7 @@
 % Assumes:
 %   - private seat-path and builtin-effect probes name their owner metta_engine
 %     [tested: the_seat_loads_wherever_the_boot_reads_seats_and_both_artefacts_exist,
-%     the_three_declared_builtins_are_registered_with_their_classes; commit=WORKTREE].
+%     the_three_declared_builtins_are_registered_with_their_classes; commit=ede2ac57e213a0d4502c6bbbca6227f97015b720].
 %   - loaded with the `extensions` token in argv, which is what makes the
 %     engine read extensions/mork/extension.pl at all; a tokenless boot is the
 %     pure kernel and every test here is skipped by seat_is_loaded/0
