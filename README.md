@@ -146,8 +146,9 @@ At the published pair above, measured on 2026-09-08:
 
 These are retired instructions for one query. Native exhibits linear growth
 and MORK quadratic growth over this family. The old-pair control gives the
-same classes. The [pin journal](../../docs/journal/2026-09-08-the-mork-pin-advanced.md)
-records both pairs, every original row's change and the controls. The simpler
+same classes. The repository's
+`docs/journal/2026-09-08-the-mork-pin-advanced.md` records both pairs,
+every original row's change and the controls. The simpler
 two-edge path graph is linear on both pairs, so it cannot replace this skewed
 fixture when assessing a join algorithm.
 
