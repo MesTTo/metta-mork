@@ -3,7 +3,7 @@ Purpose: document the MORK extension: what it provides, what it needs, and how t
 Guarantees: every name here is one the extension registers or a path it ships
   [source: extensions/mork/extension.pl; extensions/mork/mork_ffi/morkspaces.pl].
   The included page passes the website's internal-link check
-  [tested: npm run docs:build --prefix website; commit=WORKTREE].
+  [tested: npm run docs:build --prefix website; commit=c6e1198c490a824b96f6fc6e1c0622a542917024].
 -->
 
 # MORK: spaces on a Rust trie
