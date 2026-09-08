@@ -8,7 +8,7 @@
 %     than measuring a boot.
 %   - in the `window` phase, perf's control and acknowledgement pipes arrive as
 %     METTA_PERF_CONTROL_FD and METTA_PERF_ACK_FD
-%     [source: extensions/python/metta/benchmarking.py, measure_instructions'
+%     [source: extensions/python/ext/metta-benchmarking/metta_benchmarking.py, measure_instructions'
 %     controlled=True branch].
 % Guarantees:
 %   - a window that never opened exits 125 rather than failing as a workload:
