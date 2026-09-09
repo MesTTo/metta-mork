@@ -30,7 +30,7 @@
 %instantiation guards were unreachable whenever MORK was present. That is
 %every shipping configuration on a machine that built the FFI, and it made
 %(get-atoms $any) answer from MORK rather than refuse. lib_redis.pl and
-%extensions/python/metta/shim.pl are behind this same seam.
+%extensions/python/metta/_binding/shim.pl are behind this same seam.
 %
 %Load ORDER is no longer load-bearing either, which is the part worth
 %checking rather than assuming: the seam dispatches on
