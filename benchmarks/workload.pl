@@ -11,6 +11,17 @@
 %     [source: extensions/python/ext/metta-benchmarking/metta_benchmarking.py, measure_instructions'
 %     controlled=True branch].
 % Guarantees:
+%   - each acknowledgement consumes and validates the complete perf frame,
+%     including its terminating NUL
+%     [tested: BenchmarkTests.test_acknowledgements_consume_complete_frames,
+%     BenchmarkTests.test_acknowledgements_refuse_wrong_or_truncated_frames;
+%     commit=WORKTREE].
+%   - the prepared query's first count performs no library resolution
+%     [tested: BenchmarkTests.test_first_count_does_not_load_a_library_inside_the_window;
+%     commit=WORKTREE].
+%   - each control command is published in one buffered flush, so a receiver
+%     that stops reading at EAGAIN never parses a partial tag
+%     [tested: BenchmarkTests.test_control_commands_arrive_complete; commit=WORKTREE].
 %   - a window that never opened exits 125 rather than failing as a workload:
 %     the driver reads that as "this run says nothing" instead of as a moved
 %     row, which is what keeps PMU contention on a shared box from reporting a
@@ -59,6 +70,11 @@
 % instructions on mork-native-match-first-500. extensions/mork/bench.sh
 % runs the purge in a separate process before the measurement instead.
 :- ensure_loaded('../../../engine/metta.pl').
+
+% Resolve this workload's counting helper before the measured operation.
+% SWI autoload imports into the caller on first use; that costs 159 inferences.
+% https://github.com/SWI-Prolog/swipl-devel/blob/fc7ef84b949378b729052c3ade79c90ce5416abb/boot/autoload.pl
+:- use_module(library(aggregate), [aggregate_all/3]).
 
 %The rows every case works over: a path graph, so an open match answers Size
 %rows and a bound one answers exactly one whatever Size is.
@@ -282,7 +298,7 @@ bench_window(Goal) :-
     format(atom(AckPath), '/dev/fd/~d', [Ack]),
     bench_warm,
     setup_call_cleanup(
-        ( open(ControlPath, write, Out, [type(binary), buffer(false)]),
+        ( open(ControlPath, write, Out, [type(binary), buffer(full)]),
           open(AckPath, read, In, [type(binary)]),
           %A bound on the handshake, because without one a perf that never
           %armed leaves this process blocked until the driver's own deadline
@@ -300,10 +316,10 @@ bench_window(Goal) :-
 %FIRST call can autoload the library it lives in, and that load lands inside
 %the measured region: read_line_to_codes/2 did exactly that and put 1,544,926
 %instructions into an empty window, thirty times what the handshake costs
-%without it [measured 2026-08-28]. The read side is written with get_byte/2
-%for the same reason -- it is a builtin and nothing has to be found for it.
+%without it [measured 2026-08-28]. The read side uses read_string/3 for the
+%same reason: it is a builtin and nothing has to be found for it.
 bench_warm :-
-    setup_call_cleanup(open('/dev/null', write, Warm, [type(binary), buffer(false)]),
+    setup_call_cleanup(open('/dev/null', write, Warm, [type(binary), buffer(full)]),
                        bench_send(Warm, "warm"),
                        close(Warm)),
     setup_call_cleanup(open('/dev/null', read, Empty, [type(binary)]),
@@ -315,6 +331,9 @@ bench_perf(Out, In, Command) :-
     bench_acknowledge(In).
 
 bench_send(Out, Command) :-
+    % Linux evlist__ctlfd_recv stops at EAGAIN rather than retaining a partial
+    % command. Buffer its bytes until the newline and flush them together.
+    % https://github.com/torvalds/linux/blob/3cb12d27ff655e57e8efe3486dca2a22f4e30578/tools/perf/util/evlist.c#L1868
     string_codes(Command, Codes),
     bench_put(Codes, Out),
     put_byte(Out, 0'\n),
@@ -323,19 +342,16 @@ bench_send(Out, Command) :-
 bench_put([], _).
 bench_put([Code|Rest], Out) :- put_byte(Out, Code), bench_put(Rest, Out).
 
-%perf answers `ack\n`, and writes the tag's terminating NUL with it, so a
-%leftover byte is normal and is consumed by the next read. Read to the newline
-%a byte at a time, because that is the shape with no library behind it.
+%perf writes all five bytes of `ack\n` including its terminating NUL. Consume
+%the complete frame so the next command does not inherit a pending byte.
 %[source: torvalds/linux tools/perf/util/evlist.h defines
 %EVLIST_CTL_CMD_ACK_TAG as "ack\n" and tools/perf/util/evlist.c writes
 %sizeof(EVLIST_CTL_CMD_ACK_TAG), which is five bytes.]
 bench_acknowledge(In) :-
-    catch(get_byte(In, Byte), Error, bench_no_acknowledgement(Error)),
-    (   Byte =:= 0'\n
+    catch(read_string(In, 5, Reply), Error, bench_no_acknowledgement(Error)),
+    (   Reply == "ack\n\u0000"
     ->  true
-    ;   Byte =:= -1
-    ->  bench_no_acknowledgement(end_of_file)
-    ;   bench_acknowledge(In)
+    ;   bench_no_acknowledgement(invalid_reply(Reply))
     ).
 
 bench_no_acknowledgement(Cause) :-

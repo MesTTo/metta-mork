@@ -1,5 +1,5 @@
 """Purpose: measure what this backend's crossings cost, against the same work
-done by a native space, and hold every row to a committed baseline.
+done by a native space, and hold every operation to a committed baseline.
 
 The question a storage backend has to answer is whether it is worth its
 crossing at a given size, and that is a COMPARISON: the same atoms added one at
@@ -11,7 +11,7 @@ Which counter decides, and why it is not the usual one. SWI's inference counter
 retires nothing for work done inside the Rust library, so on every MORK row it
 measures the Prolog half and is blind to the half the backend exists for; a
 change measured here once read 526x faster by inferences and 1.8x SLOWER by
-CPU. So instructions:u decides every row, CPU seconds are recorded beside it as
+CPU. So instructions:u decides every operation, CPU seconds are recorded beside it as
 the counter it is checked against, and inferences are pinned as what they
 honestly are: the exact, deterministic Prolog-side cost of the same operation.
 Wall clock decides nothing.
@@ -24,6 +24,12 @@ and -714,626 under LC_ALL=C.UTF-8, three stable modes selected by the
 environment block rather than by any work [measured 2026-08-28, the flush case
 at 500]. Inside the window the same operation repeats within 0.018%.
 Guarantees:
+  - every operation subtracts the minimum empty-window sample; the calibration
+    reports its modes and retains its historical instruction number while
+    requiring exactly five inferences
+    [tested: BenchmarkTests.test_calibration_does_not_hide_injected_window_work,
+    BenchmarkTests.test_calibration_keeps_exact_inferences_and_instruction_history;
+    commit=WORKTREE]
   - both conjunction routes run at four fixed sizes, check the complete result
     bag in setup, and retain every size as a two-sided instruction pin
     [tested: extensions/mork/tests/test_benchmarks.py; commit=6da518669cb9e39557d537857c0aa7190dd2e78f]
@@ -97,6 +103,11 @@ POLICIES = {
     "instruction_policy": (
         "perf instructions:u minimum of three in a controlled window, net of "
         "the window floor; two-sided one percent band unless a row declares its own"
+    ),
+    "calibration_policy": (
+        "empty-window instructions report asynchronous enable/disable modes; "
+        "every operation subtracts their minimum because the prefix can only add; "
+        "the historical instruction number is retained and five inferences stay exact"
     ),
 }
 
@@ -263,6 +274,8 @@ def measure(sizes: tuple[int, ...], rounds: int) -> dict[str, Row]:
     load_before = Path("/proc/loadavg").read_text().strip()
     floor_samples = windowed("window-floor", sizes[0], rounds)
     floor_inferences, floor_cpu = counters("window-floor", sizes[0], rounds)
+    # The asynchronous control prefix can only add. One minimum subtraction
+    # avoids transferring the calibration's modes to the operation samples.
     floor = min(floor_samples)
     rows = {
         "mork-window-floor": Row(
@@ -303,11 +316,26 @@ def measure(sizes: tuple[int, ...], rounds: int) -> dict[str, Row]:
 
 
 def compare(rows: dict[str, Row], *, update: bool, whole_ladder: bool) -> list[str]:
-    """Hold every row to its pin. Answers one message per failing row."""
+    """Gate operations and the empty Prolog goal; report instruction calibration."""
     baseline = BenchmarkBaseline(BASELINE, update=update, policies=POLICIES)
     baseline.observe_configuration(configuration(), stamp=update and whole_ladder)
     failures: list[str] = []
     for row in rows.values():
+        if row.unit == "windows":
+            print(
+                f"{row.name}: CALIBRATION instructions={row.instructions}; "
+                f"modes={sorted(set(row.instructions))}; subtraction={min(row.instructions)} "
+                "(minimum; the asynchronous prefix can only add). Execution between "
+                "writing enable and perf enabling its event, and between writing "
+                "disable and perf disabling its event, selects these modes; they "
+                "remain with same-CPU affinity and --no-inherit."
+            )
+            if any(count != 5 for count in row.inferences):
+                failures.append(
+                    f"{row.name}: the empty operation requires exactly 5 inferences; "
+                    f"observed {row.inferences}"
+                )
+                continue
         try:
             baseline.observe_counter(
                 row.name,
@@ -317,10 +345,11 @@ def compare(rows: dict[str, Row], *, update: bool, whole_ladder: bool) -> list[s
             )
         except AssertionError as outside:
             failures.append(str(outside))
-        try:
-            baseline.observe_instructions(row.name, row.instructions)
-        except AssertionError as outside:
-            failures.append(str(outside))
+        if row.unit != "windows":
+            try:
+                baseline.observe_instructions(row.name, row.instructions)
+            except AssertionError as outside:
+                failures.append(str(outside))
         if row.cpu is not None:
             baseline.observe_cpu(row.name, row.cpu / row.operations)
     # A pinned row nothing measured can never fail, so the promise "every case
