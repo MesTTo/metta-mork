@@ -15,13 +15,13 @@
 %     including its terminating NUL
 %     [tested: BenchmarkTests.test_acknowledgements_consume_complete_frames,
 %     BenchmarkTests.test_acknowledgements_refuse_wrong_or_truncated_frames;
-%     commit=WORKTREE].
+%     commit=8ca8a387fc61d0918484b19a1a3baf85b6523043].
 %   - the prepared query's first count performs no library resolution
 %     [tested: BenchmarkTests.test_first_count_does_not_load_a_library_inside_the_window;
-%     commit=WORKTREE].
+%     commit=8ca8a387fc61d0918484b19a1a3baf85b6523043].
 %   - each control command is published in one buffered flush, so a receiver
 %     that stops reading at EAGAIN never parses a partial tag
-%     [tested: BenchmarkTests.test_control_commands_arrive_complete; commit=WORKTREE].
+%     [tested: BenchmarkTests.test_control_commands_arrive_complete; commit=8ca8a387fc61d0918484b19a1a3baf85b6523043].
 %   - a window that never opened exits 125 rather than failing as a workload:
 %     the driver reads that as "this run says nothing" instead of as a moved
 %     row, which is what keeps PMU contention on a shared box from reporting a

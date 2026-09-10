@@ -29,7 +29,7 @@ Guarantees:
     requiring exactly five inferences
     [tested: BenchmarkTests.test_calibration_does_not_hide_injected_window_work,
     BenchmarkTests.test_calibration_keeps_exact_inferences_and_instruction_history;
-    commit=WORKTREE]
+    commit=8ca8a387fc61d0918484b19a1a3baf85b6523043]
   - both conjunction routes run at four fixed sizes, check the complete result
     bag in setup, and retain every size as a two-sided instruction pin
     [tested: extensions/mork/tests/test_benchmarks.py; commit=6da518669cb9e39557d537857c0aa7190dd2e78f]

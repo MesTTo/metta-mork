@@ -3,18 +3,18 @@
 Guarantees: both stores check complete answer bags, and planted changes to any
 size's counter fail in either direction [tested: sh check.sh mork-bench-selftest; commit=6da518669cb9e39557d537857c0aa7190dd2e78f].
 The control pipe preserves whole commands when the writer yields between bytes
-[tested: BenchmarkTests.test_control_commands_arrive_complete; commit=WORKTREE].
+[tested: BenchmarkTests.test_control_commands_arrive_complete; commit=8ca8a387fc61d0918484b19a1a3baf85b6523043].
 Each acknowledgement consumes and validates perf's complete five-byte frame
 [tested: BenchmarkTests.test_acknowledgements_consume_complete_frames,
-BenchmarkTests.test_acknowledgements_refuse_wrong_or_truncated_frames; commit=WORKTREE].
+BenchmarkTests.test_acknowledgements_refuse_wrong_or_truncated_frames; commit=8ca8a387fc61d0918484b19a1a3baf85b6523043].
 Calibration modes retain minimum subtraction and cannot hide injected window
 work; calibration still requires exactly five inferences and never overwrites
 its historical instruction number
 [tested: BenchmarkTests.test_calibration_does_not_hide_injected_window_work,
-BenchmarkTests.test_calibration_keeps_exact_inferences_and_instruction_history; commit=WORKTREE].
+BenchmarkTests.test_calibration_keeps_exact_inferences_and_instruction_history; commit=8ca8a387fc61d0918484b19a1a3baf85b6523043].
 The first count of a prepared query pays no library resolution
 [tested: BenchmarkTests.test_first_count_does_not_load_a_library_inside_the_window;
-commit=WORKTREE].
+commit=8ca8a387fc61d0918484b19a1a3baf85b6523043].
 Owns resources: each test process owns its stores until exit. Temporary baseline
 files stay below the repository's scratch and are removed after each test.
 The pipe probe closes its descriptors and joins its receiver after the child exits.
