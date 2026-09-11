@@ -1,4 +1,4 @@
-% This backend's control file; see extensions/python/extension.pl for the model.
+% Purpose: declare MORK's build and platform requirements before entry loading.
 %
 % The artefact is what `sh build.sh` produces, and its absence means the
 % backend was not built rather than that anything is wrong. The predicate need
@@ -9,19 +9,15 @@
 % backend raised two ERROR lines through every boot of the Node binding, which
 % its old stderr parser matched neither of and absorbed in silence.
 %
-% BOTH shared objects are declared, because the backend needs both and a
-% raising entry does not stop a consult. morkspaces.pl opens libmork_ffi.so
+% Both shared objects are declared because the backend needs both.
+% morkspaces.pl opens libmork_ffi.so
 % for its global symbols and then use_foreign_library's morklib.so for mork/3
-% itself, and it throws when either is missing -- but SWI PRINTS a raising
-% load-time directive and carries on, so ensure_loaded/1 still succeeds and
-% the loader below it still records the seat LOADED. A tree carrying only the
-% first artefact therefore reported a live backend whose every call was
-% `Unknown procedure: mork/3`, on every boot, quietly [measured 2026-08-28:
-% twelve of the seat's own tests raised that, the other twelve passed].
-% Declaring the second is what makes that tree answer the same way an unbuilt
-% one does: nothing loads, nothing prints, and require-extension! names the
-% missing file and the command that builds it
-% [tested: extensions/mork/tests/test_missing_artefacts.sh].
+% itself. SWI prints a raising load-time directive and continues consulting;
+% loading_loudly/1 now turns that diagnostic into an exception before the
+% engine records a loaded seat. Declaring both needs still matters: an unbuilt
+% backend loads and prints nothing, while require-extension! names the missing
+% file and the command that builds it
+% [tested: extensions/mork/tests/test_missing_artefacts.sh; commit=WORKTREE].
 %
 % morkspaces.pl still raises when it is reached another way -- git-import! and
 % an embedded process that never ran this loader -- which is the half-loaded

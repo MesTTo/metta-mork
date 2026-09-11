@@ -3,12 +3,11 @@
 #   pointing a real engine boot at a seat whose artefacts are genuinely absent
 #   from disk.
 #
-#   Nothing is staged. tests/prolog/suites/seams/extensions.plt covers the
-#   require door by ASSERTING the records an unbuilt tree would hold, which
-#   proves the message and not the check that produces it. Here the loader
-#   reads the shipped extensions/mork/extension.pl, resolves its
+#   The absent-backend checks let the loader read the shipped
+#   extensions/mork/extension.pl and resolve its
 #   needs(artefact(...)) against a directory where the file is not there, and
-#   writes the record itself.
+#   write the record itself. The final invariant control deliberately plants
+#   a false loaded record in its own process after those real loader checks.
 #
 #   The tree is built from symlinks so the seat's control file is the shipped
 #   byte-for-byte one. engine/ is a real directory of per-file links rather
@@ -26,15 +25,15 @@
 #     load it names the requiring file as well.
 #   - a HALF-built tree, libmork_ffi.so present and morklib.so absent, answers
 #     exactly as an unbuilt one: both artefacts are declared needs.
-#   - the negative control for that: the same tree under a control file
-#     declaring only the first artefact, which is what this seat shipped until
-#     2026-08-28, records the seat LOADED with no mork/3 behind it, and
-#     mork_seat.plt's unconditional invariant test fails by name. SWI PRINTS a
-#     raising load-time directive and carries on, so the entry's own throw does
-#     not stop the consult and cannot stop the record.
+#   - declaring only the first artefact reaches the broken entry, reports its
+#     source path and leaves the seat unregistered; a false loaded record
+#     planted afterwards still fails mork_seat.plt's unconditional invariant
+#     by name [tested: sh check.sh mork-seat; commit=WORKTREE].
 # Fails when:
 #   - swipl is absent, which is reported rather than skipped: this seat is a
 #     Prolog provider and there is nothing to test without an engine.
+# Owns resources: the EXIT trap removes the private fixture tree; bounded.sh
+#   reaps children, including the one that owns the planted loaded record.
 # Open Obligations:
 #   To Do: None
 #   Hacks: None
@@ -171,12 +170,10 @@ mkdir -p "$half/extensions/mork/mork_ffi/target/release"
 : > "$half/extensions/mork/mork_ffi/target/release/libmork_ffi.so"
 check_absent_backend "$half" 'mork_ffi/morklib.so'
 
-# The negative control. Same tree, same absent morklib.so, and the control file
-# this seat shipped until 2026-08-28: one artefact declared, so the needs pass,
-# the entry's directive throws, SWI prints it and keeps consulting, and the
-# seat is recorded live with nothing behind it. The seat's own suite has to be
-# RED there, or every one of its conditions reads true and raises while a lane
-# that only asked "did the seat load" reads green.
+# The old one-artefact declaration passes the needs check and reaches a broken
+# entry. Unlike a declared unmet need, that is a load error. loading_loudly/1
+# now refuses registration even though SWI prints the directive and continues
+# consulting. Both the diagnostic and the absent record are part of the claim.
 control="$probe/control"
 build_tree "$control"
 mkdir -p "$control/extensions/mork/mork_ffi/target/release"
@@ -192,16 +189,21 @@ PRE_FIX_CONTROL_FILE
 staged=$(boot "$control" "
     ( metta_extension_loaded(mork) -> writeln('loaded') ; writeln('absent') ),
     ( current_predicate(mork/3) -> writeln('mork/3 present') ; writeln('mork/3 absent') )
-" 2>/dev/null)
-case "$staged" in
-    *loaded*"mork/3 absent"*) ;;
-    *) fail "the negative control no longer reproduces the configuration it" \
-            "exists for: a one-artefact control file should record the seat" \
-            "loaded with no mork/3 behind it, and it answered: $staged" ;;
-esac
+" 2> "$probe/rejected-entry.log")
+[ "$staged" = "$(printf 'absent\nmork/3 absent')" ] ||
+    fail "the broken entry was recorded as a working seat: $staged"
+for phrase in 'morkspaces.pl' 'the Prolog source did not load cleanly'; do
+    grep -Fq "$phrase" "$probe/rejected-entry.log" ||
+        fail "the broken entry's refusal lost $phrase" \
+             "$(cat "$probe/rejected-entry.log")"
+done
 
-if bounded --ceiling 250 swipl -g run_tests -t halt \
-        "$control/extensions/mork/tests/mork_seat.plt" -- extensions \
+# The loader prevents the historical false record now. Plant it explicitly in
+# a fresh unbuilt process so the seat's own invariant still proves it can see
+# that state, independently of the loader that prevents it.
+if bounded --ceiling 250 swipl \
+        -g "assertz(metta_engine:metta_extension_loaded(mork)),run_tests(mork_seat:a_recorded_seat_has_a_working_backend_behind_it)" \
+        -t halt "$unbuilt/extensions/mork/tests/mork_seat.plt" -- extensions \
         > "$probe/control.log" 2>&1
 then
     fail "the seat's own suite passed with the seat recorded loaded and no" \
@@ -217,4 +219,5 @@ esac
 
 echo "ok: an absent artefact loads nothing, says nothing, and refuses by name"
 echo "ok: a half-built tree answers exactly as an unbuilt one"
-echo "ok: a seat recorded loaded with no backend behind it fails by name"
+echo "ok: a broken entry refuses registration with its source named"
+echo "ok: a planted loaded seat with no backend behind it fails by name"
