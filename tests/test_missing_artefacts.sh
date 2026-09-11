@@ -30,14 +30,14 @@
 #   environment, after qcompile of lib/minimal_metta_lib/minimal_metta_lib.pl
 #   through a symlink to its directory;
 #   fixture=examples/ch20-extending-the-engine/20-02-metta-written-in-metta/04-minimal_metta.metta;
-#   commit=WORKTREE]. *.qlf and __pycache__ are not linked, so this tree
+#   commit=23ed2559a7c9b5712e1f6f4710ed02f8d5c6a23d]. *.qlf and __pycache__ are not linked, so this tree
 #   compiles and caches for itself, the closing check below says the checkout
 #   gained no artifact while it ran, and tests/checks/check_qlf_provenance.py
 #   is what refuses one written elsewhere should it ever land there again.
 # Guarantees:
 #   - no boot from a scratch tree writes an artifact into the checkout: every
 #     *.qlf under the checkout's engine/ and lib/ predates this test's start
-#     when it ends [tested: sh check.sh mork-seat; commit=WORKTREE]
+#     when it ends [tested: sh check.sh mork-seat; commit=23ed2559a7c9b5712e1f6f4710ed02f8d5c6a23d]
 #   - with an artefact absent the seat loads nothing and says nothing: a boot
 #     that reads the seats writes zero bytes to stdout and zero to stderr, and
 #     records the unmet need by name.
