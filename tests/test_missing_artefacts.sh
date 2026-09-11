@@ -10,13 +10,34 @@
 #   a false loaded record in its own process after those real loader checks.
 #
 #   The tree is built from symlinks so the seat's control file is the shipped
-#   byte-for-byte one. engine/ is a real directory of per-file links rather
-#   than a link to the directory, because engine/../extensions resolves through
-#   a directory symlink to the REAL checkout at the filesystem while SWI
-#   normalises the `..` lexically, and the two then disagree about which seat
-#   is being read. *.qlf is deliberately not linked, so nothing this test runs
-#   can write a compiled artifact back into the checkout.
+#   byte-for-byte one. engine/ and lib/ are real directories of per-file
+#   links, never a link to the directory itself, for two reasons.
+#   engine/../extensions resolves through a directory symlink to the REAL
+#   checkout at the filesystem while SWI normalises the `..` lexically, and the
+#   two then disagree about which seat is being read. And a boot from this
+#   tree compiles the library halves it loads beside their sources, so through
+#   a linked lib/ it wrote its artifacts INTO THE CHECKOUT, recorded under this
+#   tree's path: SWI loads an artifact from a directory other than the one it
+#   was saved in as moved, rewrites every source path it recorded and calls
+#   system:'$translated_source'/2 for each at every load, 8 inferences per
+#   one-source library that every process on the checkout then paid, and the
+#   twins lane read exactly that on the two twins importing minimal_metta_lib
+#   in three gates while no run outside a gate could [measured 2026-09-12: the
+#   minimal_metta twin 188,049 through an artifact compiled under a symlink to
+#   its library's directory, 188,041 through one compiled in place, the import
+#   itself 14,520 against 14,512; command=python
+#   extensions/python/tools/twin_coverage.py, one twin child under the lane's
+#   environment, after qcompile of lib/minimal_metta_lib/minimal_metta_lib.pl
+#   through a symlink to its directory;
+#   fixture=examples/ch20-extending-the-engine/20-02-metta-written-in-metta/04-minimal_metta.metta;
+#   commit=WORKTREE]. *.qlf and __pycache__ are not linked, so this tree
+#   compiles and caches for itself, the closing check below says the checkout
+#   gained no artifact while it ran, and tests/checks/check_qlf_provenance.py
+#   is what refuses one written elsewhere should it ever land there again.
 # Guarantees:
+#   - no boot from a scratch tree writes an artifact into the checkout: every
+#     *.qlf under the checkout's engine/ and lib/ predates this test's start
+#     when it ends [tested: sh check.sh mork-seat; commit=WORKTREE]
 #   - with an artefact absent the seat loads nothing and says nothing: a boot
 #     that reads the seats writes zero bytes to stdout and zero to stderr, and
 #     records the unmet need by name.
@@ -54,6 +75,28 @@ bounded() { sh "$project_dir/bounded.sh" "$@"; }
 
 probe=$(mktemp -d "${TMPDIR:-/tmp}/mork-missing-artefacts.XXXXXX")
 trap 'rm -rf "$probe"' EXIT HUP INT TERM
+# The instant this test started, for the closing check that the checkout gained
+# no compiled artifact while it ran.
+: > "$probe/started"
+
+# One rule for a source directory: a real directory, a link per file, and
+# nothing compiled or cached carried over, so a boot from the tree compiles and
+# caches for itself. A subshell body, because the recursion would otherwise
+# overwrite the caller's loop variables.
+link_sources() (
+    source_dir="$1"; target_dir="$2"
+    mkdir -p "$target_dir"
+    for entry in "$source_dir"/*; do
+        [ -e "$entry" ] || continue
+        name=$(basename "$entry")
+        case "$name" in *.qlf|__pycache__) continue ;; esac
+        if [ -d "$entry" ] && [ ! -L "$entry" ]; then
+            link_sources "$entry" "$target_dir/$name"
+        else
+            ln -s "$entry" "$target_dir/$name"
+        fi
+    done
+)
 
 # A tree whose only seat is mork, so the glob reads one control file and no
 # other seat's state can explain the result. The scratch root's own basename is
@@ -61,12 +104,9 @@ trap 'rm -rf "$probe"' EXIT HUP INT TERM
 # directory's basename and this test reads that text verbatim.
 build_tree() {
     tree="$1"
-    mkdir -p "$tree/engine" "$tree/extensions/mork/mork_ffi"
-    for entry in "$project_dir"/engine/*; do
-        case "$entry" in *.qlf) continue ;; esac
-        ln -s "$entry" "$tree/engine/$(basename "$entry")"
-    done
-    ln -s "$project_dir/lib" "$tree/lib"
+    mkdir -p "$tree/extensions/mork/mork_ffi"
+    link_sources "$project_dir/engine" "$tree/engine"
+    link_sources "$project_dir/lib" "$tree/lib"
     ln -s "$seat_dir/extension.pl" "$tree/extensions/mork/extension.pl"
     ln -s "$seat_dir/build.sh" "$tree/extensions/mork/build.sh"
     ln -s "$seat_dir/mork_ffi/morkspaces.pl" \
@@ -217,7 +257,17 @@ case "$(cat "$probe/control.log")" in
             "$(tail -10 "$probe/control.log")" ;;
 esac
 
+# The tree's own promise, checked: the checkout gained no compiled artifact
+# while boots from the scratch trees ran. One that did is named, because every
+# process on the checkout would then load it as moved and pay for it.
+written=$(find "$project_dir/engine" "$project_dir/lib" -name '*.qlf' -newer "$probe/started")
+[ -z "$written" ] ||
+    fail "a boot from a scratch tree wrote compiled artifacts into the checkout:" \
+         $written \
+         "every process on the checkout would load them as moved and pay for it"
+
 echo "ok: an absent artefact loads nothing, says nothing, and refuses by name"
 echo "ok: a half-built tree answers exactly as an unbuilt one"
 echo "ok: a broken entry refuses registration with its source named"
 echo "ok: a planted loaded seat with no backend behind it fails by name"
+echo "ok: the checkout gained no compiled artifact from the scratch trees"
