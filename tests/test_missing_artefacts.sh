@@ -28,7 +28,7 @@
 #   - declaring only the first artefact reaches the broken entry, reports its
 #     source path and leaves the seat unregistered; a false loaded record
 #     planted afterwards still fails mork_seat.plt's unconditional invariant
-#     by name [tested: sh check.sh mork-seat; commit=WORKTREE].
+#     by name [tested: sh check.sh mork-seat; commit=8ee8fcd4e43a932131909f7c58ad4fbe4dcf8d1d].
 # Fails when:
 #   - swipl is absent, which is reported rather than skipped: this seat is a
 #     Prolog provider and there is nothing to test without an engine.

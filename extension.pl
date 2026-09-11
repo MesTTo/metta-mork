@@ -17,7 +17,7 @@
 % engine records a loaded seat. Declaring both needs still matters: an unbuilt
 % backend loads and prints nothing, while require-extension! names the missing
 % file and the command that builds it
-% [tested: extensions/mork/tests/test_missing_artefacts.sh; commit=WORKTREE].
+% [tested: extensions/mork/tests/test_missing_artefacts.sh; commit=8ee8fcd4e43a932131909f7c58ad4fbe4dcf8d1d].
 %
 % morkspaces.pl still raises when it is reached another way -- git-import! and
 % an embedded process that never ran this loader -- which is the half-loaded
