@@ -11,8 +11,11 @@
 # Guarantees:
 #   - a missing tool or an unbuilt backend is NAMED and skipped rather than
 #     failing the gate, the same split every component script here draws: a
-#     toolchain that is absent exits 0 with a note, a measurement that runs and
-#     regresses exits nonzero.
+#     toolchain that is absent exits 125 with a note, which the gate reports as
+#     `skipped` and names under MEASURED NOTHING, while a measurement that runs
+#     and regresses exits nonzero. The two must not share exit 0, or a lane
+#     that compared nothing is indistinguishable from one that compared
+#     everything.
 #   - the measurement itself is extensions/mork/benchmarks/bench.py, which
 #     decides on instructions:u inside perf's own control window and records
 #     CPU beside it, because SWI's inference counter is blind past the FFI.
@@ -25,29 +28,38 @@ set -eu
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
 METTA_ROOT="$HERE/../.."
+
+# A missing prerequisite means this run says nothing about the tree, and 125 is
+# the one word for that here: check.sh's run() turns it into `skipped` and
+# names the lane under MEASURED NOTHING, where exiting 0 reports `ok` for a run
+# that compared not one row. This lane has already answered `ok` on four of
+# five whole-gate runs while another session held the PMU, and node-bench did
+# the same on 2026-09-20 in a battery with no node_modules; a benchmark that
+# cannot see is indistinguishable from a passing one until this word is used.
+unmeasured() {
+    echo "note: $*" >&2
+    exit 125
+}
+
 . "$HERE/../../select-python.sh"
 if [ -z "$PY" ]; then
-    echo "note: no python found (set CHECK_PY), the MORK benchmarks will not run" >&2
-    exit 0
+    unmeasured "no python found (set CHECK_PY), the MORK benchmarks will not run"
 fi
 
 for artefact in mork_ffi/target/release/libmork_ffi.so mork_ffi/morklib.so; do
     if [ ! -f "$HERE/$artefact" ]; then
-        echo "note: extensions/mork/$artefact is absent, so there is no backend \
-to measure; run sh extensions/mork/build.sh" >&2
-        exit 0
+        unmeasured "extensions/mork/$artefact is absent, so there is no backend \
+to measure; run sh extensions/mork/build.sh"
     fi
 done
 for tool in swipl perf; do
     if ! command -v "$tool" >/dev/null 2>&1; then
-        echo "note: $tool not found, the MORK benchmarks will not run" >&2
-        exit 0
+        unmeasured "$tool not found, the MORK benchmarks will not run"
     fi
 done
 if [ ! -x /usr/bin/setarch ]; then
-    echo "note: setarch not found, so address-space layout cannot be pinned \
-and the MORK benchmarks will not run" >&2
-    exit 0
+    unmeasured "setarch not found, so address-space layout cannot be pinned \
+and the MORK benchmarks will not run"
 fi
 
 # One boot before the measurement, which is the same line check.sh runs before
