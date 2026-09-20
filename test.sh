@@ -55,7 +55,7 @@ fi
 # command's status and swipl failing would be masked by the reader succeeding.
 # One spelling of the bound, implemented in bounded.sh, which every runner in
 # this tree and a command typed by hand all reach.
-bounded() { sh "$HERE/../../bounded.sh" "$@"; }
+bounded() { sh "$HERE/../../tools/bounded.sh" "$@"; }
 
 bounded swipl -g "set_test_options([format(log)]), run_tests" -t halt \
       "$HERE/tests/mork_seat.plt" -- extensions > "$log" 2>&1 || status=1

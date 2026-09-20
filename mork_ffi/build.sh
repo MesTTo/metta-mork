@@ -45,7 +45,7 @@ cd "$HERE"
 
 # One spelling of the bound, implemented in bounded.sh, which every runner in
 # this tree and a command typed by hand all reach.
-bounded() { sh "$HERE/../../../bounded.sh" "$@"; }
+bounded() { sh "$HERE/../../../tools/bounded.sh" "$@"; }
 
 missing=''
 for tool in cargo nm swipl-ld; do

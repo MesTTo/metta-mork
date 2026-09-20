@@ -41,7 +41,7 @@ unmeasured() {
     exit 125
 }
 
-. "$HERE/../../select-python.sh"
+. "$HERE/../../tools/select-python.sh"
 if [ -z "$PY" ]; then
     unmeasured "no python found (set CHECK_PY), the MORK benchmarks will not run"
 fi
@@ -77,8 +77,8 @@ fi
 # outside their 1% band [measured 2026-08-29, one A/B per half].
 # One spelling of the bound, implemented in bounded.sh, which every runner in
 # this tree and a command typed by hand all reach.
-bounded() { sh "$HERE/../../bounded.sh" "$@"; }
+bounded() { sh "$HERE/../../tools/bounded.sh" "$@"; }
 
 bounded swipl -g halt -s "$HERE/../../engine/main.pl" -- extensions >/dev/null 2>&1 || true
 
-exec sh "$HERE/../../bounded.sh" "$PY" "$HERE/benchmarks/bench.py" "$@"
+exec sh "$HERE/../../tools/bounded.sh" "$PY" "$HERE/benchmarks/bench.py" "$@"

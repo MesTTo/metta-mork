@@ -22,7 +22,7 @@ if ! command -v run >/dev/null 2>&1; then
     if [ "$#" -eq 0 ]; then
         set -- mork-seat mork-bench mork-lint mork-bench-selftest mork-rust
     fi
-    exec sh "$MORK_HERE/../../check.sh" "$@"
+    exec sh "$MORK_HERE/../../tools/check.sh" "$@"
 fi
 
 # The MORK backend, which is the seam's storage consumer: named spaces whose
