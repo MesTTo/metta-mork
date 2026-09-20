@@ -47,6 +47,8 @@ space operation.
 with arithmetic.
 
 ```metta
+!(require-extension! mork)
+!(import! &self (library lib_mm2))
 !(＋ (edge a b))
 !(test (sort-atom (collapse (? (edge $x $y) ($x $y)))) ((a b)))
 !(－ (edge a b))
@@ -56,6 +58,8 @@ with arithmetic.
 `＋*` adds a whole expression in one crossing, MORK parsing the batch itself.
 
 ```metta
+!(require-extension! mork)
+!(import! &self (library lib_mm2))
 !(＋* ((edge a b) (edge b c) (edge c d)))
 !(test (sort-atom (collapse (? (edge $x $y) ($x $y)))) ((a b) (b c) (c d)))
 ```
@@ -64,6 +68,8 @@ with arithmetic.
 `mork-flush` makes queued additions visible.
 
 ```metta
+!(require-extension! mork)
+!(import! &self (library lib_mm2))
 !(mork-add-atoms &mork ((tag 1) (tag 2)))
 !(mork-flush &mork)
 !(test (sort-atom (collapse (? (tag $n) $n))) (1 2))
@@ -73,6 +79,9 @@ with arithmetic.
 patterns, then an output block of additions and removals.
 
 ```metta
+!(require-extension! mork)
+!(import! &self (library lib_mm2))
+!(＋* ((edge a b) (edge b c) (edge c d)))
 !(~> (, (edge $x $y)) (O (+ (path $x $y))))
 !(test (sort-atom (collapse (? (path $x $y) ($x $y)))) ((a b) (b c) (c d)))
 ```
@@ -81,6 +90,8 @@ A transform that removes as well as adds replaces facts instead of
 accumulating them; `mm2-exec` runs one step.
 
 ```metta
+!(require-extension! mork)
+!(import! &self (library lib_mm2))
 !(~> (, (path $x $y)) (O (- (path $x $y)) (+ (route $x $y))))
 !(mm2-exec &mork 1)
 !(test (collapse (? (path $x $y) ($x $y))) ())
@@ -115,6 +126,8 @@ because a WebAssembly build can see the `.so` and has no dynamic linking.
 `lib_mm2` is five MeTTa operators over `&mork`:
 
 ```metta
+!(require-extension! mork)
+!(import! &self (library lib_mm2))
 !(import! &self (library lib_mm2))
 ```
 

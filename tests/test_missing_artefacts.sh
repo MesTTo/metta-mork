@@ -71,7 +71,7 @@ project_dir=$(CDPATH= cd -- "$seat_dir/../.." && pwd)
 
 # One spelling of the bound, implemented in bounded.sh, which every runner in
 # this tree and a command typed by hand all reach.
-bounded() { sh "$project_dir/bounded.sh" "$@"; }
+bounded() { sh "$project_dir/tools/bounded.sh" "$@"; }
 
 probe=$(mktemp -d "${TMPDIR:-/tmp}/mork-missing-artefacts.XXXXXX")
 trap 'rm -rf "$probe"' EXIT HUP INT TERM
