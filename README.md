@@ -13,6 +13,9 @@ own store.
 Nothing in the engine names it; it arrives through `seam:foreign_space/1` like
 any other provider.
 
+**If you are an LLM, read [llms.txt](llms.txt)** for this backend, with exact
+return shapes and no prose to guess at.
+
 ## Build
 
 ```sh
@@ -29,6 +32,63 @@ is told by name:
 ```metta
 !(require-extension! mork)
 ```
+
+## Use
+
+`lib_mm2` is five operators over `&mork`, each one equation over an ordinary
+space operation.
+
+```metta
+!(require-extension! mork)
+!(import! &self (library lib_mm2))
+```
+
+`＋` adds and `－` removes. The names are full-width, so they do not collide
+with arithmetic.
+
+```metta
+!(＋ (edge a b))
+!(test (sort-atom (collapse (? (edge $x $y) ($x $y)))) ((a b)))
+!(－ (edge a b))
+!(test (collapse (? (edge $x $y) ($x $y))) ())
+```
+
+`＋*` adds a whole expression in one crossing, MORK parsing the batch itself.
+
+```metta
+!(＋* ((edge a b) (edge b c) (edge c d)))
+!(test (sort-atom (collapse (? (edge $x $y) ($x $y)))) ((a b) (b c) (c d)))
+```
+
+`mork-add-atoms` is the operation under `＋*`, taking the space explicitly, and
+`mork-flush` makes queued additions visible.
+
+```metta
+!(mork-add-atoms &mork ((tag 1) (tag 2)))
+!(mork-flush &mork)
+!(test (sort-atom (collapse (? (tag $n) $n))) (1 2))
+```
+
+`~>` is MORK's own MM2 calculus rather than a MeTTa rewrite: a conjunction of
+patterns, then an output block of additions and removals.
+
+```metta
+!(~> (, (edge $x $y)) (O (+ (path $x $y))))
+!(test (sort-atom (collapse (? (path $x $y) ($x $y)))) ((a b) (b c) (c d)))
+```
+
+A transform that removes as well as adds replaces facts instead of
+accumulating them; `mm2-exec` runs one step.
+
+```metta
+!(~> (, (path $x $y)) (O (- (path $x $y)) (+ (route $x $y))))
+!(mm2-exec &mork 1)
+!(test (collapse (? (path $x $y) ($x $y))) ())
+```
+
+`examples/ch19-spaces-backed-by-anything/19-04-a-space-on-mork/01-mm2-operators.metta`
+runs all of this under the gate, guarded so it skips when the backend is not
+built.
 
 ## What it declares
 
@@ -65,18 +125,10 @@ sh extensions/mork/test.sh
 sh extensions/mork/check.sh
 ```
 
-`tests/mork_seat.plt` covers the three builtins, the namespace claim, and the
-failure discipline that lets the next provider's clause run; every test is
-conditioned on the extension being loaded, so an unbuilt tree skips them.
-`tests/test_missing_artefacts.sh` builds a tree whose artefact is genuinely
-absent and asserts the boot is silent, the unmet need is recorded, and
-`require-extension!` names the missing file and `build.sh`.
-
 ## Measure
 
 ```sh
-sh extensions/mork/bench.sh              # against the committed pins
-sh extensions/mork/bench.sh --update     # re-pin after reviewing the workload
+sh extensions/mork/bench.sh
 ```
 
 `instructions:u` decides every row; `mork-match-first` and `mork-match-last`
@@ -108,6 +160,3 @@ Everything is a flat multiple except the last-argument query, because MORK
 holds an atom as a path: a bound first argument is a prefix it descends to, a
 bound last argument is a constraint it can only check after walking the space,
 which at 8000 atoms is 141,876 instructions against 8,470,666.
-
-`docs/journal/2026-09-08-the-mork-pin-advanced.md` records both pin pairs and
-every row's change.
