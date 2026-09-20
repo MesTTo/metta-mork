@@ -67,7 +67,16 @@ run GATE mork-bench check_mork_bench
 # Python seat's configuration is used rather than a second one, because there
 # is one house style and a component that argued with it would be the defect.
 check_mork_lint() {
-    [ -f "$HERE/extensions/python/pyproject.toml" ] || return 0
+    # Silently, until 2026-09-20: this returned 0 with nothing printed, so a
+    # tree without the seat's configuration reported `ok` for a lane that
+    # linted no file and said so nowhere. 125 is the word for a run that says
+    # nothing about the tree, which the gate reports as `skipped` and names
+    # under MEASURED NOTHING.
+    [ -f "$HERE/extensions/python/pyproject.toml" ] || {
+        echo "note: extensions/python/pyproject.toml is absent, so there is no \
+house style to lint this seat's Python against" >&2
+        return 125
+    }
     bounded "$PY" -m ruff check --config "$HERE/extensions/python/pyproject.toml" \
         "$HERE/extensions/mork/benchmarks/bench.py" \
         "$HERE/extensions/mork/tests/test_benchmarks.py"
