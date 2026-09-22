@@ -5,6 +5,8 @@
 #
 #   Pass --update to re-pin extensions/mork/benchmarks/baseline.json after
 #   reviewing the workload, and --sizes to explore off the committed ladder.
+#   --conjunction-sweep compares product joins with native queries, including
+#   a transferred route, and --output preserves every raw counter sample.
 # Assumes: perf, setarch, swipl and a Python carrying the metta package. The
 #   measurement harness is imported from that package rather than copied, which
 #   is what DEVELOPING.md asks of a sibling.
@@ -28,6 +30,9 @@ set -eu
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
 METTA_ROOT="$HERE/../.."
+TMPDIR=${TMPDIR:-"$METTA_ROOT/ai-tmp"}
+mkdir -p "$TMPDIR"
+export TMPDIR
 
 # A missing prerequisite means this run says nothing about the tree, and 125 is
 # the one word for that here: check.sh's run() turns it into `skipped` and

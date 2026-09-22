@@ -35,10 +35,9 @@
 %     environment block rather than by any work [measured 2026-08-28, the flush
 %     case at 500]. Under the window the same operation reads within 0.018%
 %     across separate invocations.
-%   - there is no teardown in the measured region: the process exit is the
-%     teardown, and seam:foreign_clear/1 removes atoms ONE AT A TIME, which
-%     measured 13x the cost of every workload here when it sat inside
-%     [measured 2026-08-28].
+%   - ordinary cases leave teardown to process exit. The transfer comparison
+%     includes releasing its query-local native space because every query
+%     would pay that cost [source: bench_transferred_join/2; commit=WORKTREE].
 %   - a MORK read case flushes in SETUP, so the pending-write flush a read
 %     performs implicitly is not charged to the read and the MORK and native
 %     sides of a comparison are asked the same question
@@ -52,6 +51,9 @@
 %     before measuring the shared-variable join through match/4
 %     [tested: extensions/mork/tests/test_benchmarks.py; commit=6da518669cb9e39557d537857c0aa7190dd2e78f].
 % Owns resources:
+%   - bench_transferred_join/2 releases its native snapshot on exhaustion,
+%     cut, failure or exception through setup_call_cleanup/3
+%     [source: bench_transferred_join/2; commit=WORKTREE].
 %   - the two /dev/fd streams the window opens, closed by setup_call_cleanup/3
 %     whether the operation succeeds, fails or throws. The inherited descriptors
 %     THEMSELVES are not closed: SWI has no raw close, opening /dev/fd/N makes a
@@ -171,6 +173,15 @@ bench_case('native-conjunction', Size,
            bench_join_count(Space, Count), Count, 0) :-
     native_space('native-conjunction', Size, Space).
 
+% The same MORK store, transferred inside the measurement window. This is a
+% candidate execution strategy using published language and lifetime services.
+% Its full cost must precede any routing decision.
+bench_case('transferred-conjunction', Size,
+           ( bench_join_fill(Space, Size),
+             bench_check_join(bench_transferred_join, Space, Size) ),
+           bench_transferred_join_count(Space, Count), Count, 0) :-
+    mork_space('transferred-conjunction', Size, Space).
+
 %Flush is the one case whose setup must NOT flush: what it measures is the cost
 %of publishing writes that are still queued.
 bench_case(flush, Size, bench_queue(Space, Size),
@@ -184,6 +195,18 @@ bench_case(flush, Size, bench_queue(Space, Size),
 bench_case('window-floor', _, true, bench_nothing(Count), Count, 1).
 
 %%%% What the cases are made of %%%%
+
+bench_transferred_join_count(Space, Count) :-
+    aggregate_all(count, bench_transferred_join(Space, _), Count).
+
+% Space: N copied rows. Time includes N foreign reads and native insertions,
+% the native join, and releasing the snapshot; N is the source atom count.
+bench_transferred_join(Space, Triple) :-
+    setup_call_cleanup(
+        'new-space'(Native),
+        ( forall(seam:foreign_atoms(Space, Row), 'add-atom'(Native, Row, _)),
+          bench_join(Native, Triple) ),
+        metta_release_space(Native)).
 
 bench_batch(Space, Rows, Count) :-
     'mork-add-atoms'(Space, Rows, true),
@@ -225,16 +248,22 @@ bench_join_count(Space, Count) :-
 %An always-empty query cannot pass this control. Remove the witness even on
 %failure, then warm and check the empty bag measured inside the window.
 bench_check_join(Space, Size) :-
+    bench_check_join(bench_join, Space, Size).
+
+bench_check_join(Join, Space, Size) :-
     Vertex is Size // 2 + 1,
     Closing = [edge, Vertex, 1],
     setup_call_cleanup(
         'add-atom'(Space, Closing, _),
-        bench_join_answers(Space, [[0, Vertex, 1], [1, 0, Vertex], [Vertex, 1, 0]]),
+        bench_join_answers(Join, Space, [[0, Vertex, 1], [1, 0, Vertex], [Vertex, 1, 0]]),
         'remove-atom'(Space, Closing, _)),
-    bench_join_answers(Space, []).
+    bench_join_answers(Join, Space, []).
 
 bench_join_answers(Space, Expected) :-
-    findall(Triple, bench_join(Space, Triple), Found),
+    bench_join_answers(bench_join, Space, Expected).
+
+bench_join_answers(Join, Space, Expected) :-
+    findall(Triple, call(Join, Space, Triple), Found),
     msort(Found, Sorted),
     ( Sorted == Expected
       -> true

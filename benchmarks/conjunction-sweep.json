@@ -1,0 +1,565 @@
+{
+  "configuration": {
+    "c_reader": true,
+    "c_writer": true,
+    "mork_ffi": true,
+    "morklib": true,
+    "seats": [
+      "mork",
+      "node",
+      "python"
+    ]
+  },
+  "sources": {
+    "extensions/mork/benchmarks/bench.py": "acfcad0485c5edac2e5a401938c76178550bb2cdf656e6c366df11a6913cafde",
+    "extensions/mork/benchmarks/workload.pl": "e0c3c928598803ab376b747164478b76df61f845af8e8ee90386c403ba361217",
+    "extensions/mork/mork_ffi/morkspaces.pl": "64c5ac743ec0433324ff02c37a9dccbc8047e1ec109475856f8810f56da8c96b",
+    "engine/spaces/native_matching.pl": "0c6a1a6cc4ce1788a44e37ffbf9255f179a2d5db3b403a3492927a3a469099f2"
+  },
+  "rows": {
+    "mork-window-floor": {
+      "name": "mork-window-floor",
+      "unit": "windows",
+      "operations": 1,
+      "instructions": [
+        16056,
+        16056,
+        16056
+      ],
+      "inferences": [
+        5,
+        5,
+        5
+      ],
+      "cpu": 8.8e-07
+    },
+    "mork-native-conjunction-100": {
+      "name": "mork-native-conjunction-100",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        1236272,
+        1236272,
+        1236272
+      ],
+      "inferences": [
+        1480,
+        1480,
+        1480
+      ],
+      "cpu": 5.442e-05
+    },
+    "mork-mork-conjunction-100": {
+      "name": "mork-mork-conjunction-100",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        7988189,
+        7988391,
+        7988389
+      ],
+      "inferences": [
+        191,
+        191,
+        191
+      ],
+      "cpu": 0.000348498
+    },
+    "mork-transferred-conjunction-100": {
+      "name": "mork-transferred-conjunction-100",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        11735647,
+        11736611,
+        11736246
+      ],
+      "inferences": [
+        9723,
+        9723,
+        9723
+      ],
+      "cpu": 0.000667268
+    },
+    "mork-native-conjunction-128": {
+      "name": "mork-native-conjunction-128",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        1570593,
+        1570478,
+        1570548
+      ],
+      "inferences": [
+        1872,
+        1872,
+        1872
+      ],
+      "cpu": 6.845e-05
+    },
+    "mork-mork-conjunction-128": {
+      "name": "mork-mork-conjunction-128",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        11911078,
+        11911077,
+        11911076
+      ],
+      "inferences": [
+        191,
+        191,
+        191
+      ],
+      "cpu": 0.000545708
+    },
+    "mork-transferred-conjunction-128": {
+      "name": "mork-transferred-conjunction-128",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        13161712,
+        13161824,
+        13166655
+      ],
+      "inferences": [
+        10871,
+        10871,
+        10871
+      ],
+      "cpu": 0.000740537
+    },
+    "mork-native-conjunction-136": {
+      "name": "mork-native-conjunction-136",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        1665505,
+        1665461,
+        1665505
+      ],
+      "inferences": [
+        1984,
+        1984,
+        1984
+      ],
+      "cpu": 7.1599e-05
+    },
+    "mork-mork-conjunction-136": {
+      "name": "mork-mork-conjunction-136",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        13190041,
+        13190242,
+        13190240
+      ],
+      "inferences": [
+        191,
+        191,
+        191
+      ],
+      "cpu": 0.000592557
+    },
+    "mork-transferred-conjunction-136": {
+      "name": "mork-transferred-conjunction-136",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        13571914,
+        13572292,
+        13572390
+      ],
+      "inferences": [
+        11199,
+        11199,
+        11199
+      ],
+      "cpu": 0.000776447
+    },
+    "mork-native-conjunction-137": {
+      "name": "mork-native-conjunction-137",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        1673272,
+        1673272,
+        1673228
+      ],
+      "inferences": [
+        1992,
+        1992,
+        1992
+      ],
+      "cpu": 7.2739e-05
+    },
+    "mork-mork-conjunction-137": {
+      "name": "mork-mork-conjunction-137",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        13356794,
+        13356596,
+        13356795
+      ],
+      "inferences": [
+        191,
+        191,
+        191
+      ],
+      "cpu": 0.000596587
+    },
+    "mork-transferred-conjunction-137": {
+      "name": "mork-transferred-conjunction-137",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        13618205,
+        13617189,
+        13617886
+      ],
+      "inferences": [
+        11234,
+        11234,
+        11234
+      ],
+      "cpu": 0.000808327
+    },
+    "mork-native-conjunction-138": {
+      "name": "mork-native-conjunction-138",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        1689275,
+        1689276,
+        1689230
+      ],
+      "inferences": [
+        2012,
+        2012,
+        2012
+      ],
+      "cpu": 7.368e-05
+    },
+    "mork-mork-conjunction-138": {
+      "name": "mork-mork-conjunction-138",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        13465025,
+        13465225,
+        13465273
+      ],
+      "inferences": [
+        191,
+        191,
+        191
+      ],
+      "cpu": 0.000615688
+    },
+    "mork-transferred-conjunction-138": {
+      "name": "mork-transferred-conjunction-138",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        13676825,
+        13675602,
+        13677113
+      ],
+      "inferences": [
+        11281,
+        11281,
+        11281
+      ],
+      "cpu": 0.000820646
+    },
+    "mork-native-conjunction-139": {
+      "name": "mork-native-conjunction-139",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        1697042,
+        1697042,
+        1696924
+      ],
+      "inferences": [
+        2020,
+        2020,
+        2020
+      ],
+      "cpu": 7.36e-05
+    },
+    "mork-mork-conjunction-139": {
+      "name": "mork-mork-conjunction-139",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        13633994,
+        13633989,
+        13634132
+      ],
+      "inferences": [
+        191,
+        191,
+        191
+      ],
+      "cpu": 0.000612508
+    },
+    "mork-transferred-conjunction-139": {
+      "name": "mork-transferred-conjunction-139",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        13722826,
+        13722473,
+        13721466
+      ],
+      "inferences": [
+        11316,
+        11316,
+        11316
+      ],
+      "cpu": 0.000764507
+    },
+    "mork-native-conjunction-140": {
+      "name": "mork-native-conjunction-140",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        1712989,
+        1712989,
+        1712944
+      ],
+      "inferences": [
+        2040,
+        2040,
+        2040
+      ],
+      "cpu": 7.485e-05
+    },
+    "mork-mork-conjunction-140": {
+      "name": "mork-mork-conjunction-140",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        13933553,
+        13933551,
+        13933753
+      ],
+      "inferences": [
+        191,
+        191,
+        191
+      ],
+      "cpu": 0.000618478
+    },
+    "mork-transferred-conjunction-140": {
+      "name": "mork-transferred-conjunction-140",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        13775579,
+        13775352,
+        13776242
+      ],
+      "inferences": [
+        11363,
+        11363,
+        11363
+      ],
+      "cpu": 0.000778678
+    },
+    "mork-native-conjunction-160": {
+      "name": "mork-native-conjunction-160",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        1950181,
+        1950297,
+        1950179
+      ],
+      "inferences": [
+        2320,
+        2320,
+        2320
+      ],
+      "cpu": 8.319e-05
+    },
+    "mork-mork-conjunction-160": {
+      "name": "mork-mork-conjunction-160",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        17526510,
+        17526712,
+        17526511
+      ],
+      "inferences": [
+        191,
+        191,
+        191
+      ],
+      "cpu": 0.000780638
+    },
+    "mork-transferred-conjunction-160": {
+      "name": "mork-transferred-conjunction-160",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        14788425,
+        14786957,
+        14787639
+      ],
+      "inferences": [
+        12183,
+        12183,
+        12183
+      ],
+      "cpu": 0.000840417
+    },
+    "mork-native-conjunction-400": {
+      "name": "mork-native-conjunction-400",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        4807065,
+        4807066,
+        4806947
+      ],
+      "inferences": [
+        5680,
+        5680,
+        5680
+      ],
+      "cpu": 0.000200499
+    },
+    "mork-mork-conjunction-400": {
+      "name": "mork-mork-conjunction-400",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        122615055,
+        122615255,
+        122615253
+      ],
+      "inferences": [
+        191,
+        191,
+        191
+      ],
+      "cpu": 0.005005722
+    },
+    "mork-transferred-conjunction-400": {
+      "name": "mork-transferred-conjunction-400",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        27000911,
+        26997858,
+        27001986
+      ],
+      "inferences": [
+        22023,
+        22023,
+        22023
+      ],
+      "cpu": 0.001514104
+    },
+    "mork-native-conjunction-1600": {
+      "name": "mork-native-conjunction-1600",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        19089640,
+        19089638,
+        19089593
+      ],
+      "inferences": [
+        22480,
+        22480,
+        22480
+      ],
+      "cpu": 0.000778307
+    },
+    "mork-mork-conjunction-1600": {
+      "name": "mork-mork-conjunction-1600",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        1567407405,
+        1567412938,
+        1567407409
+      ],
+      "inferences": [
+        191,
+        191,
+        191
+      ],
+      "cpu": 0.065595146
+    },
+    "mork-transferred-conjunction-1600": {
+      "name": "mork-transferred-conjunction-1600",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        89157102,
+        91180785,
+        91500294
+      ],
+      "inferences": [
+        71223,
+        71223,
+        71223
+      ],
+      "cpu": 0.00528742
+    },
+    "mork-native-conjunction-3200": {
+      "name": "mork-native-conjunction-3200",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        38165695,
+        38165736,
+        38165771
+      ],
+      "inferences": [
+        44880,
+        44880,
+        44880
+      ],
+      "cpu": 0.001507315
+    },
+    "mork-mork-conjunction-3200": {
+      "name": "mork-mork-conjunction-3200",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        7508855755,
+        7508855437,
+        7508855463
+      ],
+      "inferences": [
+        191,
+        191,
+        191
+      ],
+      "cpu": 0.306461189
+    },
+    "mork-transferred-conjunction-3200": {
+      "name": "mork-transferred-conjunction-3200",
+      "unit": "queries",
+      "operations": 1,
+      "instructions": [
+        173330944,
+        171540157,
+        173551696
+      ],
+      "inferences": [
+        136823,
+        136823,
+        136823
+      ],
+      "cpu": 0.010265552
+    }
+  }
+}

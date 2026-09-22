@@ -15,6 +15,13 @@ BenchmarkTests.test_calibration_keeps_exact_inferences_and_instruction_history; 
 The first count of a prepared query pays no library resolution
 [tested: BenchmarkTests.test_first_count_does_not_load_a_library_inside_the_window;
 commit=8ca8a387fc61d0918484b19a1a3baf85b6523043].
+The transfer route checks positive and empty answer bags, releases its snapshot
+on a cut, and preserves the source; crossover reporting retains every observed
+winner change without extrapolating a threshold
+[tested: BenchmarkTests.test_transfer_query_cannot_pass_with_an_always_empty_implementation,
+BenchmarkTests.test_transfer_releases_its_space_on_cut_and_preserves_source,
+BenchmarkTests.test_sweep_reports_all_winner_changes_without_extrapolation;
+commit=WORKTREE].
 Owns resources: each test process owns its stores until exit. Temporary baseline
 files stay below the repository's scratch and are removed after each test.
 The pipe probe closes its descriptors and joins its receiver after the child exits.
@@ -269,9 +276,70 @@ class BenchmarkTests(unittest.TestCase):
         self.assertEqual(refused.exception.code, 2)
         measure.assert_not_called()
 
+    def test_sweep_reports_all_winner_changes_without_extrapolation(self):
+        """A nonmonotone winner cannot be presented as a global size threshold."""
+        sizes = (2, 4, 8, 16)
+        rows = {
+            bench.row_name(case, size): bench.Row(
+                bench.row_name(case, size), "queries", 1, [cost], [1], None,
+            )
+            for case, costs in zip(bench.JOIN_CASES, ((30, 30, 30, 30), (10, 40, 20, 50)),
+                                   strict=True)
+            for size, cost in zip(sizes, costs, strict=True)
+        }
+        with contextlib.redirect_stdout(io.StringIO()) as printed:
+            bench.report_joins(rows, sizes)
+        self.assertEqual(printed.getvalue().count("crossover bracket:"), 3)
+        self.assertIn("2 < N <= 4; native-conjunction wins at N=4", printed.getvalue())
+        self.assertIn("4 < N <= 8; mork-conjunction wins at N=8", printed.getvalue())
+        with contextlib.redirect_stdout(io.StringIO()) as printed:
+            bench.report_joins({name: replace(row, instructions=[10 if "native" in name else 20])
+                               for name, row in rows.items()}, sizes)
+        self.assertIn("no crossover observed", printed.getvalue())
+
+    def test_sweep_refuses_invalid_sizes_and_partial_repinning(self):
+        """Malformed exploration must fail before starting a workload."""
+        requests = [
+            ["--conjunction-sweep", "--join-sizes", sizes]
+            for sizes in ("1,2", "2", "4,2", "2,2", "")
+        ] + [["--conjunction-sweep", "--update"], ["--join-sizes", "2,4"]]
+        for request in requests:
+            with (self.subTest(request=request), patch.object(bench, "measure") as measure,
+                  contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit)):
+                bench.main(request)
+            measure.assert_not_called()
+
+    def test_transfer_query_cannot_pass_with_an_always_empty_implementation(self):
+        """The transferred route must pass its own positive bag control."""
+        result = subprocess.run(  # noqa: S603 -- fixed mutation of the benchmark subject
+            ["swipl", "-q", "-s", str(bench.WORKLOAD), "-g",  # noqa: S607 -- gate's SWI
+             "abolish(bench_transferred_join/2),assertz((bench_transferred_join(_,_):-fail)),"
+             "catch((bench_run('transferred-conjunction',8,counters),halt(1)),"
+             "error(domain_error(conjunction_answers,[]),_),halt(0))",
+             "-t", "halt", "--", "extensions"],
+            capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_transfer_releases_its_space_on_cut_and_preserves_source(self):
+        """A consumer taking one answer must not strand a native snapshot."""
+        result = subprocess.run(  # noqa: S603 -- fixed lifetime probe
+            ["swipl", "-q", "-s", str(bench.WORKLOAD), "-g",  # noqa: S607 -- gate's SWI
+             "bench_join_fill('&mork:lifetime',8),"
+             "'add-atom'('&mork:lifetime',[edge,5,1],_),"
+             "metta_space_names(Before0),sort(Before0,Before),"
+             "once(bench_transferred_join('&mork:lifetime',_)),"
+             "metta_space_names(After0),sort(After0,After),"
+             "Before==After,bench_join_answers('&mork:lifetime',"
+             "[[0,5,1],[1,0,5],[5,1,0]]),halt",
+             "-t", "halt", "--", "extensions"],
+            capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_both_stores_verify_the_projected_triples(self):
         """Even and odd graphs run the positive control and the empty query."""
-        for case in bench.JOIN_CASES:
+        for case in bench.SWEEP_CASES:
             for size in (2, 3, 5, 17):
                 result = subprocess.run(  # noqa: S603 -- fixed cases from the seat's workload
                     bench.command(case, size, "counters"),

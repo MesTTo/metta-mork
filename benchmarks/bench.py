@@ -16,17 +16,22 @@ the counter it is checked against, and inferences are pinned as what they
 honestly are: the exact, deterministic Prolog-side cost of the same operation.
 Wall clock decides nothing.
 
-Each row is measured inside perf's own control window, so the boot, the setup
-and the teardown are outside the count. Whole-process subtraction was tried
+Each row is measured inside perf's own control window. Boot and fixture setup
+are outside the count; the transferred route includes snapshot creation and
+release because each query pays them. Whole-process subtraction was tried
 first and is not usable at this resolution: one operation's difference read
 +1,592,533 instructions under an inherited environment, +774,281 under LC_ALL=C
 and -714,626 under LC_ALL=C.UTF-8, three stable modes selected by the
 environment block rather than by any work [measured 2026-08-28, the flush case
 at 500]. Inside the window the same operation repeats within 0.018%.
 Guarantees:
+  - the conjunction-only sweep reports observed crossover brackets and saves
+    raw samples without changing baseline pins
+    [tested: BenchmarkTests.test_sweep_reports_all_winner_changes_without_extrapolation,
+    BenchmarkTests.test_sweep_refuses_invalid_sizes_and_partial_repinning; commit=WORKTREE]
   - every operation subtracts the minimum empty-window sample; the calibration
     reports its modes and retains its historical instruction number while
-    requiring exactly five inferences
+    requiring exactly five inferences in the pinned comparison
     [tested: BenchmarkTests.test_calibration_does_not_hide_injected_window_work,
     BenchmarkTests.test_calibration_keeps_exact_inferences_and_instruction_history;
     commit=8ca8a387fc61d0918484b19a1a3baf85b6523043]
@@ -58,11 +63,13 @@ Open Obligations:
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import subprocess
 import sys
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
+from hashlib import sha256
 from math import log
 from pathlib import Path
 from statistics import linear_regression
@@ -93,6 +100,7 @@ from metta_benchmarking import (  # noqa: E402  -- on_path() above is what makes
 SIZES = (500, 2000, 8000)
 JOIN_SIZES = (100, 400, 1600, 3200)
 JOIN_CASES = ("native-conjunction", "mork-conjunction")
+SWEEP_CASES = (*JOIN_CASES, "transferred-conjunction")
 ROUNDS = 3
 POLICIES = {
     "counter_policy": (
@@ -245,7 +253,8 @@ def windowed(case: str, size: int, rounds: int, attempts: int = 3) -> list[int]:
         try:
             return list(
                 measure_instructions(
-                    command(case, size, "window"), rounds=rounds, controlled=True
+                    command(case, size, "window"), rounds=rounds, controlled=True,
+                    timeout=float("inf"),
                 )
             )
         except (RuntimeError, TimeoutError) as unopened:
@@ -264,7 +273,11 @@ def row_name(case: str, size: int) -> str:
     return f"mork-{case}-{size}"
 
 
-def measure(sizes: tuple[int, ...], rounds: int) -> dict[str, Row]:
+def measure(
+    sizes: tuple[int, ...], rounds: int, *,
+    cases: tuple[str, ...] = CASES, join_sizes: tuple[int, ...] = JOIN_SIZES,
+    join_cases: tuple[str, ...] = JOIN_CASES,
+) -> dict[str, Row]:
     """Every row, measured.
 
     The floor is measured first, so a cold .qlf pays there, and it is taken off
@@ -288,10 +301,10 @@ def measure(sizes: tuple[int, ...], rounds: int) -> dict[str, Row]:
         f"loadavg_before={load_before}; "
         f"loadavg_after={Path('/proc/loadavg').read_text().strip()}"
     )
-    schedule = [(case, size) for size in sizes for case in CASES]
-    schedule.extend((case, size) for size in JOIN_SIZES for case in JOIN_CASES)
+    schedule = [(case, size) for size in sizes for case in cases]
+    schedule.extend((case, size) for size in join_sizes for case in join_cases)
     for case, size in schedule:
-        operations = QUERIES if case in SELECTIVE else 1 if case in JOIN_CASES else size
+        operations = QUERIES if case in SELECTIVE else 1 if case in join_cases else size
         load_before = Path("/proc/loadavg").read_text().strip()
         raw = windowed(case, size, rounds)
         instructions = [sample - floor for sample in raw]
@@ -304,7 +317,7 @@ def measure(sizes: tuple[int, ...], rounds: int) -> dict[str, Row]:
             raise RuntimeError(msg)
         inferences, cpu = counters(case, size, rounds)
         name = row_name(case, size)
-        unit = "queries" if case in SELECTIVE or case in JOIN_CASES else "operations"
+        unit = "queries" if case in SELECTIVE or case in join_cases else "operations"
         rows[name] = Row(name, unit, operations, instructions, inferences, cpu)
         print(
             f"{name}: instructions={instructions} raw={raw} "
@@ -370,18 +383,21 @@ def compare(rows: dict[str, Row], *, update: bool, whole_ladder: bool) -> list[s
     return failures
 
 
-def join_exponents(rows: dict[str, Row]) -> dict[str, float]:
-    """Fit total join instructions to N**p across the four declared sizes.
+def join_exponents(
+    rows: dict[str, Row], sizes: tuple[int, ...] = JOIN_SIZES,
+    cases: tuple[str, ...] = JOIN_CASES,
+) -> dict[str, float]:
+    """Fit total join instructions to N**p across the measured sizes.
 
     The standard-library least-squares fit over logarithms estimates p. It
     describes these sizes; the individual row pins gate subsequent movement.
     """
     return {
         case: linear_regression(
-            [log(size) for size in JOIN_SIZES],
-            [log(min(rows[row_name(case, size)].instructions)) for size in JOIN_SIZES],
+            [log(size) for size in sizes],
+            [log(min(rows[row_name(case, size)].instructions)) for size in sizes],
         ).slope
-        for case in JOIN_CASES
+        for case in cases
     }
 
 
@@ -425,18 +441,43 @@ def report(rows: dict[str, Row], sizes: tuple[int, ...]) -> None:
             f"| {case} | {min(row.inferences) / row.operations:,.1f} | "
             f"{row.cpu / row.operations * 1e6:.3f} | {row.per_operation():,.0f} |"
         )
+    report_joins(rows, JOIN_SIZES)
+
+
+def report_joins(
+    rows: dict[str, Row], sizes: tuple[int, ...], cases: tuple[str, ...] = JOIN_CASES,
+) -> None:
+    """Report measured winners and crossover brackets without extrapolating."""
     print()
     print(
-        "| skewed triangle | " + " | ".join(str(size) for size in JOIN_SIZES)
+        "| skewed triangle | " + " | ".join(str(size) for size in sizes)
         + " | fitted exponent |"
     )
-    print("|---" * (len(JOIN_SIZES) + 2) + "|")
-    for case, exponent in join_exponents(rows).items():
-        cells = [min(rows[row_name(case, size)].instructions) for size in JOIN_SIZES]
+    print("|---" * (len(sizes) + 2) + "|")
+    for case, exponent in join_exponents(rows, sizes, cases).items():
+        cells = [min(rows[row_name(case, size)].instructions) for size in sizes]
         print(
             f"| {case} | " + " | ".join(f"{cell:,}" for cell in cells)
             + f" | {exponent:.4f} |"
         )
+    compared = tuple(case for case in cases if case != "native-conjunction") if len(cases) > 2 else cases
+    print("crossover comparison: " + " versus ".join(compared))
+    winners = []
+    for size in sizes:
+        costs = {case: min(rows[row_name(case, size)].instructions) for case in compared}
+        best = min(costs.values())
+        winners.append(" and ".join(case for case, cost in costs.items() if cost == best))
+    changes = [(left, right, after) for left, right, before, after
+               in zip(sizes[:-1], sizes[1:], winners[:-1], winners[1:], strict=True)
+               if before != after]
+    if changes:
+        for left, right, winner in changes:
+            print(f"crossover bracket: {left} < N <= {right}; {winner} wins at N={right}")
+    else:
+        print(f"no crossover observed on N={sizes[0]}..{sizes[-1]}; "
+              f"lowest cost at every sampled size: {winners[0]}")
+    print("native-conjunction excludes migration; transferred-conjunction includes "
+          "MORK enumeration, native insertion, the query, and release.")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -444,6 +485,15 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--update", action="store_true")
     parser.add_argument("--rounds", type=int, default=ROUNDS)
+    parser.add_argument(
+        "--conjunction-sweep", action="store_true",
+        help="measure only the paired joins and report their crossover, without repinning",
+    )
+    parser.add_argument(
+        "--join-sizes", type=lambda text: tuple(int(part) for part in text.split(",")),
+        default=JOIN_SIZES, help="ordered distinct sizes, at least two, each >= 2",
+    )
+    parser.add_argument("--output", type=Path, help="write all raw counter samples as JSON")
     parser.add_argument(
         "--sizes",
         type=lambda text: tuple(int(part) for part in text.split(",")),
@@ -454,13 +504,37 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("rounds and sizes must be positive")
     if arguments.update and tuple(arguments.sizes) != SIZES:
         parser.error("--update requires the complete default size set to preserve every row")
+    if (len(arguments.join_sizes) < 2 or min(arguments.join_sizes) < 2
+            or tuple(sorted(set(arguments.join_sizes))) != arguments.join_sizes):
+        parser.error("join sizes must be increasing, distinct, and at least two values >= 2")
+    if arguments.join_sizes != JOIN_SIZES and not arguments.conjunction_sweep:
+        parser.error("--join-sizes requires --conjunction-sweep")
+    if arguments.update and arguments.conjunction_sweep:
+        parser.error("--conjunction-sweep cannot update the complete benchmark baseline")
 
     # What else the box was doing, recorded with every run rather than
     # remembered: instructions:u is far steadier than wall clock but the two
     # noisiest rows here are the native-space ones, and a reader comparing two
     # runs needs to know whether the machine was busy for either.
     print(f"loadavg: {Path('/proc/loadavg').read_text().strip()}")
-    rows = measure(arguments.sizes, arguments.rounds)
+    rows = measure(arguments.sizes, arguments.rounds,
+                   cases=() if arguments.conjunction_sweep else CASES,
+                   join_sizes=arguments.join_sizes,
+                   join_cases=SWEEP_CASES if arguments.conjunction_sweep else JOIN_CASES)
+    if arguments.output:
+        arguments.output.write_text(json.dumps({
+            "configuration": configuration(),
+            "sources": {
+                str(path.relative_to(ROOT)): sha256(path.read_bytes()).hexdigest()
+                for path in (Path(__file__).resolve(), WORKLOAD,
+                             SEAT / "mork_ffi" / "morkspaces.pl",
+                             ROOT / "engine" / "spaces" / "native_matching.pl")
+            },
+            "rows": {name: asdict(row) for name, row in rows.items()},
+        }, indent=2) + "\n")
+    if arguments.conjunction_sweep:
+        report_joins(rows, arguments.join_sizes, SWEEP_CASES)
+        return 0
     report(rows, arguments.sizes)
     failures = compare(
         rows,

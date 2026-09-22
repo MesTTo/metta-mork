@@ -142,7 +142,23 @@ sh extensions/mork/check.sh
 
 ```sh
 sh extensions/mork/bench.sh
+METTA_CHILD_CEILING=0 sh extensions/mork/bench.sh --conjunction-sweep \
+  --join-sizes 100,128,136,137,138,139,140,160,400,1600,3200 \
+  --output extensions/mork/benchmarks/conjunction-sweep.json
 ```
+
+The second command compares native storage, MORK's product join, and a native
+snapshot copied from the same MORK store. It includes copying and releasing the
+snapshot, checks complete answer bags, retains all counter samples, and reports
+every observed crossover. `METTA_CHILD_CEILING=0` disables the repository runner's
+runtime deadline. It does not change the performance-counter measurement.
+The default sweep sizes are 100, 400, 1600 and 3200; the additional sizes resolve
+the measured crossing. This exploration does not update the benchmark pins.
+
+The [routing measurement](benchmarks/conjunction-routing.md) records the
+139–140 crossing and its workload and ownership limits. The production provider
+still uses its existing route; this measurement does not install a general
+atom-count threshold.
 
 `instructions:u` decides every row; `mork-match-first` and `mork-match-last`
 both read 133 inferences at 8000 atoms while their CPU reads 7.4 and 342.7
