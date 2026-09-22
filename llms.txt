@@ -60,5 +60,5 @@ early arguments.
 ## Where to read next
 
 - `extensions/mork/README.md` explains the seat and its needs.
-- `lib/lib_mm2/lib_mm2.metta` is the operator surface, and its first line is
+- `lib/lib_mm2/pkg.metta` is the operator surface, and its first line is
   the `require-extension!` above.
