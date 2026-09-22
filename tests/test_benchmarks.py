@@ -21,7 +21,7 @@ winner change without extrapolating a threshold
 [tested: BenchmarkTests.test_transfer_query_cannot_pass_with_an_always_empty_implementation,
 BenchmarkTests.test_transfer_releases_its_space_on_cut_and_preserves_source,
 BenchmarkTests.test_sweep_reports_all_winner_changes_without_extrapolation;
-commit=WORKTREE].
+commit=d4c783dbda83e7e62e25dee07711d31f205902b3].
 Owns resources: each test process owns its stores until exit. Temporary baseline
 files stay below the repository's scratch and are removed after each test.
 The pipe probe closes its descriptors and joins its receiver after the child exits.

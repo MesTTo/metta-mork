@@ -37,7 +37,7 @@
 %     across separate invocations.
 %   - ordinary cases leave teardown to process exit. The transfer comparison
 %     includes releasing its query-local native space because every query
-%     would pay that cost [source: bench_transferred_join/2; commit=WORKTREE].
+%     would pay that cost [source: bench_transferred_join/2; commit=d4c783dbda83e7e62e25dee07711d31f205902b3].
 %   - a MORK read case flushes in SETUP, so the pending-write flush a read
 %     performs implicitly is not charged to the read and the MORK and native
 %     sides of a comparison are asked the same question
@@ -53,7 +53,7 @@
 % Owns resources:
 %   - bench_transferred_join/2 releases its native snapshot on exhaustion,
 %     cut, failure or exception through setup_call_cleanup/3
-%     [source: bench_transferred_join/2; commit=WORKTREE].
+%     [source: bench_transferred_join/2; commit=d4c783dbda83e7e62e25dee07711d31f205902b3].
 %   - the two /dev/fd streams the window opens, closed by setup_call_cleanup/3
 %     whether the operation succeeds, fails or throws. The inherited descriptors
 %     THEMSELVES are not closed: SWI has no raw close, opening /dev/fd/N makes a

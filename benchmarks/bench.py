@@ -28,7 +28,7 @@ Guarantees:
   - the conjunction-only sweep reports observed crossover brackets and saves
     raw samples without changing baseline pins
     [tested: BenchmarkTests.test_sweep_reports_all_winner_changes_without_extrapolation,
-    BenchmarkTests.test_sweep_refuses_invalid_sizes_and_partial_repinning; commit=WORKTREE]
+    BenchmarkTests.test_sweep_refuses_invalid_sizes_and_partial_repinning; commit=d4c783dbda83e7e62e25dee07711d31f205902b3]
   - every operation subtracts the minimum empty-window sample; the calibration
     reports its modes and retains its historical instruction number while
     requiring exactly five inferences in the pinned comparison
