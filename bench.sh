@@ -67,12 +67,18 @@ if [ ! -x /usr/bin/setarch ]; then
 and the MORK benchmarks will not run"
 fi
 
-# One boot before the measurement, which is the same line check.sh runs before
-# its lanes and for two reasons at once. engine/main.pl loads engine/qlf_boot.pl,
-# which PURGES a .qlf set older than any source: the engine's units are
-# consulted by umbrellas, so a unit edit leaves the umbrella's artifact fresh by
-# mtime and the workload would otherwise measure the previous compile. And the
-# boot REGENERATES the set, which is what the pins were taken against.
+# A purge and then one boot before the measurement, so the governed .qlf set the
+# workload loads is always the one engine/main.pl regenerates, which is what the
+# pins were taken against. The boot alone purged only a set older than a source,
+# and a FRESH set another boot path left is not that set: the C and engine
+# benches prepare theirs through engine/bench.pl, which also compiles
+# engine/identity.qlf and engine/source_loading.qlf where main.pl's boot consults
+# those two from source, and loading them compiled moved mork-native-add-500 and
+# -2000 by +1.23% and +1.22% with their inferences unchanged, so this lane failed
+# whenever c-bench ran before it in the gate [measured 2026-09-24: in one battery
+# on one tree, 10,411,451 after c-bench's boot preparation and 10,280,582 after a
+# purge; commit=98549966e58c9455bfaf539b54641c555fc9da5e]. The lane runs alone
+# in check.sh, so the purge races no other lane's boot.
 #
 # Both halves are load-bearing and each fails differently. Loading the purge
 # inside benchmarks/workload.pl instead puts it in the MEASURED process, worth
@@ -84,6 +90,8 @@ fi
 # this tree and a command typed by hand all reach.
 bounded() { sh "$HERE/../../tools/bounded.sh" "$@"; }
 
+bounded swipl -q -s "$HERE/../../engine/qlf_boot.pl" -g metta_qlf_boot:purge_all_qlf -t halt \
+    </dev/null >/dev/null 2>&1 || true
 bounded swipl -g halt -s "$HERE/../../engine/main.pl" -- extensions >/dev/null 2>&1 || true
 
 exec sh "$HERE/../../tools/bounded.sh" "$PY" "$HERE/benchmarks/bench.py" "$@"
