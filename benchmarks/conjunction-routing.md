@@ -129,8 +129,8 @@ successful rerun. Existing engine warnings included `Illegal multibyte Sequence`
 
 An initial selftest used the wrong Python and failed with
 `ImportError: deferred module publication requires CPython 3.12 or later`.
-Using `/home/user/Dev/.venv-pypetta/bin/python` passed all 17 tests.
+Using the venv interpreter that carries the patched host passed all 17 tests.
 Battery contention also produced
 `battery 3 is running as PID 73502; pick another index` and
-`rm: cannot remove '/home/user/Dev/PyPeTTa1/PeTTa/ai-tmp/wt-merge/ai-tmp/wt-battery-2/extensions/python.gitseed/tests/ch15_writing_transactions_and_worlds': Directory not empty`.
+`rm: cannot remove '<checkout>/ai-tmp/wt-battery-2/extensions/python.gitseed/tests/ch15_writing_transactions_and_worlds': Directory not empty`, the checkout's own path shortened here to `<checkout>`.
 Battery 4 supplied the successful measurements.
