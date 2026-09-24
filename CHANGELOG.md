@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- Re-pin twenty-four instruction rows to the swipl the measurement names.
+  Since 310b6a9a2 metta-benchmarking counts the swipl on the measurement's
+  PATH, the patched build, where it counted the stock swipl that perf's own
+  PATH put first. On that build batch-add, per-atom-add, mork-match-first,
+  mork-match-open and native-match-open cost 3 to 6 percent fewer
+  instructions and native-add, native-match-first and native-match-last about
+  1 percent more, which left fifteen rows outside their bands and the native
+  ones at their edge. Inference pins and every other row are unchanged; the
+  ladder that places the move is in `benchmarks/baseline.json`'s
+  `host_count_repin_comment`.
+
 - `bench.sh` purges the governed .qlf set before the boot that regenerates it,
   so the workload always loads the set `engine/main.pl` builds, which is what
   the pins were taken against. The boot alone purged only a stale set, and a
