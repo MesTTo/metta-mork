@@ -27,3 +27,7 @@
 - Record a 139–140 row crossover for the warmed two-hub triangle workload.
   Production routing and L069 remain open pending the engine ownership and
   language-policy decision described in `benchmarks/conjunction-routing.md`.
+
+
+- NOTICE keeps the MIT copyright and permission notice of PeTTa, whose MORK
+  backend this repository began as, beside the Apache-2.0 LICENSE.
